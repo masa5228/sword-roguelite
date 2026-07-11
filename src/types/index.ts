@@ -111,8 +111,23 @@ export interface ResultData {
   totalCoins: number;
   maxDamage: number;
   swordName: string;
+  swordBaseName: string;
+  swordType: SwordType;
+  swordLevel: number;
+  characterType: CharacterType;
+  characterName: string;
   bestRarity: SwordRarity | null;
   playTimeMs: number;
   newRecord: boolean;
   retired: boolean;
+}
+
+export interface RankingEntry {
+  player_name: string;
+  character_name: string;
+  sword_name: string;
+  sword_type: SwordType;
+  sword_level: number;
+  floor: number;
+  created_at: string;
 }

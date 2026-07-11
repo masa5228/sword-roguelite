@@ -8,6 +8,7 @@ import { renderSwordPickup } from "./screens/swordPickup";
 import { renderBossReward } from "./screens/bossReward";
 import { renderPause } from "./screens/pause";
 import { renderResult } from "./screens/result";
+import { renderRanking } from "./screens/ranking";
 
 // §19 画面遷移を担うDOMオーバーレイ管理
 export class UIManager implements UiPort {
@@ -53,6 +54,11 @@ export class UIManager implements UiPort {
 
   showResult(result: ResultData): void {
     this.show(renderResult(this.flow, result, this.show));
+  }
+
+  showRanking(): void {
+    this.hudHide();
+    this.show(renderRanking(this.flow));
   }
 
   closeScreen(): void {

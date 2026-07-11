@@ -1,5 +1,6 @@
 import type { GameFlow } from "../../game/GameFlow";
 import { loadSave } from "../../services/saveService";
+import { getPlayerName, setPlayerName } from "../../services/rankingService";
 import { button, el, screenEl } from "../components";
 import { renderDexScreen } from "./dex";
 import { renderSettings } from "./settings";
@@ -12,6 +13,17 @@ export function renderTitle(flow: GameFlow, show: (el: HTMLElement) => void): HT
 
   s.appendChild(el("h1", undefined, "⚔️ アンジョウ・ダンジョン"));
   s.appendChild(el("div", "subtitle", "剣を拾い、鍛え、より深い階層へ"));
+
+  const nameBox = el("label", "player-name-box");
+  nameBox.appendChild(el("span", undefined, "プレイヤー名"));
+  const nameInput = el("input", "player-name-input") as HTMLInputElement;
+  nameInput.type = "text";
+  nameInput.maxLength = 12;
+  nameInput.placeholder = "プレイヤー名";
+  nameInput.value = getPlayerName();
+  nameInput.addEventListener("input", () => setPlayerName(nameInput.value));
+  nameBox.appendChild(nameInput);
+  s.appendChild(nameBox);
 
   const menu = el("div");
   menu.style.display = "flex";
@@ -28,6 +40,7 @@ export function renderTitle(flow: GameFlow, show: (el: HTMLElement) => void): HT
     menu.appendChild(button("▶ ゲーム開始", "menu-btn primary", () => show(renderCharacterSelect(flow, show))));
   }
 
+  menu.appendChild(button("🏆 ランキング", "menu-btn", () => flow.ui.showRanking()));
   menu.appendChild(button("📖 剣図鑑", "menu-btn", () => show(renderDexScreen(flow, "sword", () => flow.ui.showTitle()))));
   menu.appendChild(button("👹 敵図鑑", "menu-btn", () => show(renderDexScreen(flow, "enemy", () => flow.ui.showTitle()))));
   menu.appendChild(button("⚙ 設定", "menu-btn", () => show(renderSettings(() => flow.ui.showTitle()))));

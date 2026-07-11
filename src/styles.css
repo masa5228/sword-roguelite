@@ -505,6 +505,158 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.menu-btn.compact {
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.player-name-box,
+.ranking-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #b8c8e2;
+}
+
+.player-name-box {
+  margin-top: 8px;
+}
+
+.player-name-input,
+.ranking-select {
+  min-height: 44px;
+  width: 100%;
+  border: 2px solid #526b91;
+  border-radius: 4px;
+  background: rgba(11, 20, 36, 0.9);
+  color: #edf5ff;
+  font: inherit;
+  font-size: 15px;
+  padding: 9px 12px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.player-name-input:focus,
+.ranking-select:focus {
+  border-color: #f1c65a;
+  outline: none;
+}
+
+.ranking-content {
+  min-height: 160px;
+}
+
+.ranking-status,
+.ranking-submit-box {
+  border: 1px solid rgba(126, 154, 199, 0.55);
+  border-radius: 4px;
+  background: rgba(11, 20, 36, 0.58);
+  padding: 12px;
+  color: #b8c8e2;
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.ranking-status .menu-btn,
+.ranking-submit-box .menu-btn {
+  margin-top: 10px;
+}
+
+.ranking-submit-status {
+  color: #dfeaff;
+  font-weight: 700;
+}
+
+.ranking-submit-status.muted {
+  color: #9a9ab8;
+  font-weight: 500;
+}
+
+.ranking-name-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.ranking-name-row .menu-btn {
+  width: auto;
+  margin-top: 0;
+}
+
+.ranking-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid rgba(126, 154, 199, 0.45);
+  border-radius: 4px;
+}
+
+.ranking-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: rgba(11, 20, 36, 0.62);
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 8px 7px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ranking-table th {
+  color: #ffd76a;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ranking-table tr.self {
+  background: rgba(241, 198, 90, 0.16);
+  font-weight: 700;
+}
+
+.ranking-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.rank-cell,
+.floor-cell {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ranking-weapon {
+  display: grid;
+  grid-template-columns: 34px minmax(120px, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.ranking-weapon-icon {
+  width: 32px;
+  height: 26px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.ranking-weapon-level {
+  color: #b8c8e2;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .dex-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

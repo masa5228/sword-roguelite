@@ -38,6 +38,7 @@ export interface UiPort {
   showBossReward(swords: Sword[]): void;
   showPause(): void;
   showResult(result: ResultData): void;
+  showRanking(): void;
   closeScreen(): void;
   hudShow(): void;
   hudHide(): void;
@@ -359,6 +360,11 @@ export class GameFlow {
       totalCoins: run.totalCoinsEarned,
       maxDamage: run.maxDamage,
       swordName: `${run.equippedSword.name} Lv.${run.equippedSword.level}`,
+      swordBaseName: run.equippedSword.name,
+      swordType: run.equippedSword.type,
+      swordLevel: run.equippedSword.level,
+      characterType: run.character.type,
+      characterName: run.character.name,
       bestRarity: run.bestRarityFound,
       playTimeMs: Date.now() - run.startedAt,
       newRecord: run.floor >= save.highestFloor,
