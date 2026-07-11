@@ -1,4 +1,4 @@
-// E2E検証 その2: ボス撃破→ボス報酬 / 剣ドロップ→売却 / ポーズ→リタイア
+// E2E検証 その2: ボス撃破→ボス報酬 / 剣ドロップ→維持 / ポーズ→リタイア
 import { chromium } from "playwright";
 
 const SHOT_DIR = process.argv[2] ?? ".";
@@ -8,7 +8,7 @@ const log = (...a) => console.log("[verify2]", ...a);
 
 const browser = await chromium.launch();
 const ctx = await browser.newContext({
-  viewport: { width: 844, height: 390 },
+  viewport: { width: 390, height: 844 },
   isMobile: true,
   hasTouch: true,
   deviceScaleFactor: 2,
@@ -72,13 +72,13 @@ await shot("20-boss-battle");
 
 let sawBossReward = false;
 let sawPickup = false;
-let soldSword = false;
+let keptSword = false;
 
 outer: for (let round = 0; round < 30; round++) {
   // 戦闘: タップ連打
   for (let i = 0; i < 120; i++) {
     if (await screenOpen()) break;
-    await page.mouse.click(422, 210);
+    await page.mouse.click(195, 430);
     await page.waitForTimeout(180);
   }
   if (!(await screenOpen())) {
@@ -95,12 +95,12 @@ outer: for (let round = 0; round < 30; round++) {
       log("boss reward screen OK");
       await page.getByRole("button", { name: "この剣を装備する" }).first().click();
       await page.waitForTimeout(400);
-    } else if (text.includes("剣を発見")) {
+    } else if (text.includes("武器を入手")) {
       sawPickup = true;
       await shot("22-sword-pickup");
-      log("pickup screen OK — selling");
-      await page.getByRole("button", { name: /売却する/ }).click();
-      soldSword = true;
+      log("pickup screen OK — keeping current sword");
+      await page.locator(".weapon-panel:not(.featured)").first().click();
+      keptSword = true;
       await page.waitForTimeout(400);
     } else if (text.includes("クリア")) {
       if (sawPickup) break outer; // 目的達成
@@ -148,7 +148,7 @@ log("discoveredSwords:", save.discoveredSwords);
 log("highestFloor:", save.highestFloor);
 
 log("=== SUMMARY ===");
-log("boss reward:", sawBossReward, "/ pickup:", sawPickup, "/ sold:", soldSword);
+log("boss reward:", sawBossReward, "/ pickup:", sawPickup, "/ kept:", keptSword);
 log("js errors:", errors.length ? errors : "none");
 
 await browser.close();

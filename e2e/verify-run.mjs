@@ -8,7 +8,7 @@ const log = (...a) => console.log("[verify]", ...a);
 
 const browser = await chromium.launch();
 const ctx = await browser.newContext({
-  viewport: { width: 844, height: 390 },
+  viewport: { width: 390, height: 844 },
   isMobile: true,
   hasTouch: true,
   deviceScaleFactor: 2,
@@ -24,16 +24,16 @@ page.on("console", (m) => {
 const shot = (name) => page.screenshot({ path: `${SHOT_DIR}/${name}.png` });
 const canvasTap = async () => {
   // Phaser canvas 中央下寄り（UIボタンを避ける）をタップ
-  await page.mouse.click(422, 210);
+  await page.mouse.click(195, 430);
 };
 const swipe = async (dir) => {
-  await page.mouse.move(422, 210);
+  await page.mouse.move(195, 430);
   await page.mouse.down();
-  await page.mouse.move(422 + dir * 90, 212, { steps: 3 });
+  await page.mouse.move(195 + dir * 90, 430, { steps: 3 });
   await page.mouse.up();
 };
 const longPress = async (ms) => {
-  await page.mouse.move(422, 210);
+  await page.mouse.move(195, 430);
   await page.mouse.down();
   await page.waitForTimeout(ms);
   await page.mouse.up();
@@ -46,7 +46,7 @@ await page.goto(URL);
 await page.waitForSelector("#ui-root .screen", { timeout: 20000 });
 await page.waitForTimeout(300);
 await shot("01-title");
-const titleVisible = await page.getByText("ソード・ダイバー").first().isVisible();
+const titleVisible = await page.locator("#ui-root h1", { hasText: "アンジョウ・ダンジョン" }).first().isVisible();
 log("title visible:", titleVisible);
 
 // LocalStorage初期状態確認
@@ -99,11 +99,11 @@ outer: for (let floor = 1; floor <= 12; floor++) {
       await shot("09-result-death");
       log("result screen reached (death). floors cleared:", floorsCleared);
       break outer;
-    } else if (text.includes("剣を発見")) {
+    } else if (text.includes("武器を入手")) {
       sawPickup = true;
       await shot(`05-pickup-floor${floor}`);
       // 比較表確認のうえ維持を選択
-      await page.getByRole("button", { name: /現在の剣を維持/ }).click();
+      await page.locator(".weapon-panel:not(.featured)").first().click();
       await page.waitForTimeout(400);
     } else if (text.includes("ボス撃破")) {
       sawBossReward = true;

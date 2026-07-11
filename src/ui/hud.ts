@@ -1,6 +1,7 @@
 import type { GameFlow } from "../game/GameFlow";
 import { DODGE_CHARGES } from "../game/GameFlow";
 import { SWORD_BASES } from "../game/data/swords";
+import { maxLevel } from "../game/systems/UpgradeSystem";
 import { characterFrameUrl, weaponUrl } from "../game/assets";
 import { el, button, swordStatsTable } from "./components";
 
@@ -156,6 +157,9 @@ export class Hud {
     }
 
     const sword = run.equippedSword;
+    const swordMaxLevel = maxLevel(sword);
+    const heat = sword.level <= 0 || swordMaxLevel <= 0 ? 0 : Math.min(3, Math.ceil((sword.level / swordMaxLevel) * 3));
+    this.root.setAttribute("data-heat", String(heat));
     this.playerPortrait.src = characterFrameUrl(run.character.type, "idle");
     this.swordIcon.src = weaponUrl(sword.type);
     this.swordLabel.textContent = `${sword.name} Lv.${sword.level}`;

@@ -19,13 +19,15 @@ import { loadSave } from "../../services/saveService";
 import { applyCharacterToSword, characterChargeMaxMs, characterChargeStartMs } from "../systems/CharacterSystem";
 import { characterFrameKey, characterFrameUrl, enemyFrameKey, enemyFrameUrl, weaponKey, weaponUrl, type BossFrame, type EnemyFrame, type PlayerFrame } from "../assets";
 
-export const GAME_WIDTH = 844;
-export const GAME_HEIGHT = 390;
+export const GAME_WIDTH = 390;
+export const GAME_HEIGHT = 844;
 
-const PLAYER_X = 210;
-const PLAYER_Y = 252;
-const ENEMY_X = 634;
-const ENEMY_Y = 190;
+const PLAYER_X = 195;
+const PLAYER_Y = 560;
+const ENEMY_X = 195;
+const ENEMY_Y = 300;
+const PLAYER_SWORD_OFFSET_X = 30;
+const PLAYER_SWORD_OFFSET_Y = -14;
 
 // §7.4 誤操作対策
 const SWIPE_THRESHOLD_PX = 42;
@@ -118,14 +120,14 @@ export class BattleScene extends Phaser.Scene {
     this.drawBackground(1);
 
     this.floorLabel = this.add
-      .text(GAME_WIDTH / 2, 28, "", { fontSize: "16px", color: "#d7e5ff", fontStyle: "bold", stroke: "#10152a", strokeThickness: 5 })
+      .text(GAME_WIDTH / 2, 112, "", { fontSize: "16px", color: "#c7d0d8", fontStyle: "bold", stroke: "#151210", strokeThickness: 5 })
       .setOrigin(0.5)
       .setDepth(8);
 
     this.warnRing = this.add.graphics();
 
     this.playerBody = this.add.image(PLAYER_X, PLAYER_Y, characterFrameKey("renon", "idle")).setOrigin(0.5).setScale(1.35).setDepth(4).setFlipX(false);
-    this.playerSword = this.add.image(PLAYER_X + 32, PLAYER_Y - 12, weaponKey("longSword")).setOrigin(0.5).setScale(0.23).setDepth(5);
+    this.playerSword = this.add.image(PLAYER_X + PLAYER_SWORD_OFFSET_X, PLAYER_Y + PLAYER_SWORD_OFFSET_Y, weaponKey("longSword")).setOrigin(0.5).setScale(0.23).setDepth(5);
     this.playerSword.setAngle(-25);
 
     this.chargeBar = this.add.graphics();
@@ -156,15 +158,15 @@ export class BattleScene extends Phaser.Scene {
 
     this.drawBackground(enemy.floor);
     this.floorLabel.setText(bossHint ? "⚔ BOSS ⚔" : `${enemy.floor}F`);
-    this.floorLabel.setColor(bossHint ? "#ff6a6a" : "#d7e5ff");
+    this.floorLabel.setColor(bossHint ? "#e8443b" : "#c7d0d8");
     this.playerBody.setPosition(PLAYER_X, PLAYER_Y).setAlpha(1).setScale(1.35);
-    this.playerSword.setPosition(PLAYER_X + 32, PLAYER_Y - 12).setAngle(-25).setAlpha(1).setScale(0.23);
+    this.playerSword.setPosition(PLAYER_X + PLAYER_SWORD_OFFSET_X, PLAYER_Y + PLAYER_SWORD_OFFSET_Y).setAngle(-25).setAlpha(1).setScale(0.23);
     this.setPlayerFrame("idle");
     this.playerSword.setTexture(weaponKey(this.flow.run!.equippedSword.type));
 
     const isGiant = enemy.eliteEffects.includes("giant");
     const scale = enemy.role === "boss" ? 1.32 : isGiant ? 1.7 : 1.35;
-    this.enemyBody = this.add.image(ENEMY_X, ENEMY_Y - 60, enemyFrameKey(enemy.type, "idle")).setOrigin(0.5).setScale(scale).setAlpha(0).setDepth(4).setFlipX(true);
+    this.enemyBody = this.add.image(ENEMY_X, ENEMY_Y - 40, enemyFrameKey(enemy.type, "idle")).setOrigin(0.5).setScale(scale).setAlpha(0).setDepth(4).setFlipX(true);
 
     if (enemy.role === "elite") {
       this.enemyBody.setTint(0xffd0d0);
@@ -226,44 +228,77 @@ export class BattleScene extends Phaser.Scene {
   private drawBackground(floor: number): void {
     const tier = Math.floor((floor - 1) / 10) % 4;
     const palettes = [
-      [0x10162b, 0x25345d, 0x1a233d],
-      [0x26142a, 0x5b2b63, 0x382040],
-      [0x10252a, 0x28605d, 0x17393d],
-      [0x2b1b12, 0x6d4122, 0x3d2818],
+      [0x151210, 0x25345d, 0x1a233d],
+      [0x171116, 0x5b2b63, 0x382040],
+      [0x101817, 0x28605d, 0x17393d],
+      [0x1a120d, 0x6d4122, 0x3d2818],
     ];
-    const [sky, accent, floorColor] = palettes[tier];
+    const [vaultColor, accent, floorColor] = palettes[tier];
+    const cx = GAME_WIDTH / 2;
+    const vanishY = 118;
+    const floorTopY = 242;
+    const floorBottomY = GAME_HEIGHT;
     this.bgGraphics.clear();
-    this.bgGraphics.fillStyle(sky, 1);
+    this.bgGraphics.fillStyle(vaultColor, 1);
     this.bgGraphics.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-    this.bgGraphics.fillStyle(accent, 0.26);
-    this.bgGraphics.fillRect(0, 76, GAME_WIDTH, 214);
-    this.bgGraphics.fillStyle(0x080b16, 0.38);
-    this.bgGraphics.fillRect(0, 290, GAME_WIDTH, GAME_HEIGHT - 290);
+    this.bgGraphics.fillStyle(accent, 0.16);
+    this.bgGraphics.fillTriangle(0, 150, GAME_WIDTH, 150, cx, vanishY);
+    this.bgGraphics.fillStyle(accent, 0.12);
+    this.bgGraphics.fillRect(0, 150, GAME_WIDTH, floorTopY - 150);
 
-    for (let x = 28; x < GAME_WIDTH; x += 106) {
-      this.bgGraphics.fillStyle(0xffffff, 0.06);
-      this.bgGraphics.fillRect(x, 82, 10, 198);
-      this.bgGraphics.fillStyle(0x000000, 0.22);
-      this.bgGraphics.fillRect(x + 10, 82, 6, 198);
+    this.bgGraphics.fillStyle(floorColor, 0.64);
+    this.bgGraphics.fillTriangle(16, floorBottomY, GAME_WIDTH - 16, floorBottomY, cx, floorTopY);
+    this.bgGraphics.fillStyle(0x000000, 0.32);
+    this.bgGraphics.fillTriangle(0, floorBottomY, 16, floorBottomY, cx, floorTopY);
+    this.bgGraphics.fillTriangle(GAME_WIDTH, floorBottomY, GAME_WIDTH - 16, floorBottomY, cx, floorTopY);
+
+    this.bgGraphics.lineStyle(2, 0xffffff, 0.08);
+    this.bgGraphics.lineBetween(cx, vanishY, 16, floorBottomY);
+    this.bgGraphics.lineBetween(cx, vanishY, GAME_WIDTH - 16, floorBottomY);
+    this.bgGraphics.lineStyle(1, 0xffffff, 0.055);
+    for (let i = -3; i <= 3; i++) {
+      const x = cx + i * 34;
+      const endX = cx + i * 84;
+      this.bgGraphics.lineBetween(x, floorTopY, endX, floorBottomY);
     }
-    for (let y = 306; y < GAME_HEIGHT; y += 28) {
-      this.bgGraphics.lineStyle(1, 0xffffff, 0.08);
-      this.bgGraphics.lineBetween(0, y, GAME_WIDTH, y);
+    for (let i = 0; i < 11; i++) {
+      const t = i / 10;
+      const y = Phaser.Math.Linear(floorTopY + 8, floorBottomY - 18, t * t);
+      const halfW = Phaser.Math.Linear(20, GAME_WIDTH / 2 - 18, t);
+      this.bgGraphics.lineStyle(i % 2 === 0 ? 2 : 1, 0xffffff, 0.05 + 0.035 * t);
+      this.bgGraphics.lineBetween(cx - halfW, y, cx + halfW, y);
     }
-    for (let x = -24; x < GAME_WIDTH + 24; x += 48) {
-      this.bgGraphics.lineStyle(1, 0xffffff, 0.055);
-      this.bgGraphics.lineBetween(x, 290, x + 62, GAME_HEIGHT);
+
+    for (const side of [-1, 1]) {
+      for (let i = 0; i < 4; i++) {
+        const yTop = 174 + i * 86;
+        const yBottom = yTop + 164;
+        const innerTop = cx + side * (54 + i * 12);
+        const innerBottom = cx + side * (134 + i * 22);
+        const outerTop = cx + side * (90 + i * 16);
+        const outerBottom = cx + side * (GAME_WIDTH / 2 + 18);
+        this.bgGraphics.fillStyle(0xffffff, 0.045);
+        this.bgGraphics.fillTriangle(innerTop, yTop, outerTop, yTop + 16, innerBottom, yBottom);
+        this.bgGraphics.fillTriangle(outerTop, yTop + 16, outerBottom, yBottom, innerBottom, yBottom);
+        this.bgGraphics.lineStyle(1, 0x000000, 0.22);
+        this.bgGraphics.lineBetween(innerTop, yTop, innerBottom, yBottom);
+      }
     }
-    this.bgGraphics.fillStyle(floorColor, 0.34);
-    this.bgGraphics.fillTriangle(0, 290, GAME_WIDTH, 290, GAME_WIDTH / 2, GAME_HEIGHT);
-    this.bgGraphics.lineStyle(2, 0xf4d37a, 0.22);
-    this.bgGraphics.lineBetween(74, ENEMY_Y + 62, GAME_WIDTH - 74, ENEMY_Y + 62);
-    this.bgGraphics.lineBetween(74, PLAYER_Y + 56, GAME_WIDTH - 74, PLAYER_Y + 56);
-    this.bgGraphics.fillStyle(0xffffff, 0.18);
-    for (let i = 0; i < 18; i++) {
-      const x = (i * 53 + floor * 17) % GAME_WIDTH;
-      const y = 88 + ((i * 71 + floor * 29) % 172);
-      this.bgGraphics.fillRect(x, y, 3, 3);
+
+    this.bgGraphics.lineStyle(2, 0xf4b740, 0.18);
+    this.bgGraphics.lineBetween(112, ENEMY_Y + 46, GAME_WIDTH - 112, ENEMY_Y + 46);
+    this.bgGraphics.lineStyle(2, 0xf26419, 0.16);
+    this.bgGraphics.lineBetween(64, PLAYER_Y + 72, GAME_WIDTH - 64, PLAYER_Y + 72);
+    this.bgGraphics.fillStyle(0xf26419, 0.08);
+    this.bgGraphics.fillRect(0, GAME_HEIGHT - 92, GAME_WIDTH, 92);
+    this.bgGraphics.fillStyle(0xf4b740, 0.05);
+    this.bgGraphics.fillTriangle(0, GAME_HEIGHT, GAME_WIDTH, GAME_HEIGHT, cx, GAME_HEIGHT - 180);
+
+    this.bgGraphics.fillStyle(0xffffff, 0.16);
+    for (let i = 0; i < 16; i++) {
+      const x = 36 + ((i * 47 + floor * 19) % (GAME_WIDTH - 72));
+      const y = 154 + ((i * 67 + floor * 31) % 182);
+      this.bgGraphics.fillRect(x, y, 2, 2);
     }
   }
 
@@ -396,10 +431,10 @@ export class BattleScene extends Phaser.Scene {
       ENEMY_X + Phaser.Math.Between(-30, 30),
       ENEMY_Y - 40,
       `${actual}`,
-      isCritical ? "#ffd76a" : "#ffffff",
+      isCritical ? "#f4b740" : "#ffffff",
       isCritical ? 30 : 22
     );
-    if (isCritical) this.spawnFloatText(ENEMY_X, ENEMY_Y - 90, "会心!", "#ffd76a", 18);
+    if (isCritical) this.spawnFloatText(ENEMY_X, ENEMY_Y - 90, "会心!", "#f4b740", 18);
 
     const fxOn = loadSave().settings.graphicsQuality !== "low";
     this.enemyBody.setTintFill(0xffffff);
@@ -456,7 +491,7 @@ export class BattleScene extends Phaser.Scene {
     const targets = [this.playerBody, this.playerSword];
     this.tweens.add({
       targets,
-      x: `+=${dir * 92}`,
+      x: `+=${dir * 64}`,
       duration: 140,
       yoyo: true,
       ease: "Quad.easeOut",
@@ -465,7 +500,7 @@ export class BattleScene extends Phaser.Scene {
       },
       onComplete: () => {
         this.playerBody.setX(PLAYER_X);
-        this.playerSword.setX(PLAYER_X + 32);
+        this.playerSword.setX(PLAYER_X + PLAYER_SWORD_OFFSET_X);
         this.playerBody.setAlpha(1);
         this.setPlayerFrame("idle");
         this.dodging = false;
@@ -521,7 +556,7 @@ export class BattleScene extends Phaser.Scene {
       if (this.dot.poisonUntil > this.clock) dotDmg += dotDamagePerTick(sword, "poison");
       if (dotDmg > 0) {
         enemy.currentHp = Math.max(0, enemy.currentHp - dotDmg);
-        this.spawnFloatText(ENEMY_X + 40, ENEMY_Y - 20, `${dotDmg}`, "#c07aff", 16);
+        this.spawnFloatText(ENEMY_X + 40, ENEMY_Y - 44, `${dotDmg}`, "#f26419", 16);
         this.flow.ui.hudUpdate();
         if (enemy.currentHp <= 0) {
           this.killEnemy();
@@ -538,7 +573,7 @@ export class BattleScene extends Phaser.Scene {
         const heal = Math.round(enemy.maxHp * 0.015);
         if (enemy.currentHp < enemy.maxHp) {
           enemy.currentHp = Math.min(enemy.maxHp, enemy.currentHp + heal);
-          this.spawnFloatText(ENEMY_X - 40, ENEMY_Y - 20, `+${heal}`, "#5dde8f", 14);
+          this.spawnFloatText(ENEMY_X - 40, ENEMY_Y - 44, `+${heal}`, "#5dde8f", 14);
           this.flow.ui.hudUpdate();
         }
       }
@@ -622,7 +657,7 @@ export class BattleScene extends Phaser.Scene {
       this.phaseTimer = pattern.telegraphTime;
       this.strikeDamageMult = pattern.damageMultiplier;
       this.hitsRemaining = pattern.hits;
-      this.spawnFloatText(ENEMY_X, ENEMY_Y - 110, pattern.nameJa, "#ff8a8a", 18);
+      this.spawnFloatText(ENEMY_X, ENEMY_Y - 110, pattern.nameJa, "#f26419", 18);
       playSfx("bossWarn");
     } else {
       const base = ENEMY_BASES[enemy.type as Exclude<typeof enemy.type, "bossKnight">];
@@ -643,7 +678,7 @@ export class BattleScene extends Phaser.Scene {
 
     if (ranged) {
       // 魔術師: 弾を飛ばす (§12.3)
-      const proj = this.add.text(ENEMY_X, ENEMY_Y + 20, "✦", { fontSize: "30px", color: "#c07aff" }).setOrigin(0.5);
+      const proj = this.add.text(ENEMY_X, ENEMY_Y + 22, "✦", { fontSize: "30px", color: "#f4b740" }).setOrigin(0.5);
       this.tweens.add({
         targets: proj,
         x: PLAYER_X,
@@ -659,8 +694,8 @@ export class BattleScene extends Phaser.Scene {
       // 近接: 敵が突っ込む
       this.tweens.add({
         targets: this.enemyBody,
-        x: PLAYER_X + 92,
-        y: PLAYER_Y - 18,
+        x: PLAYER_X,
+        y: PLAYER_Y - 70,
         duration: 160,
         yoyo: true,
         ease: "Quad.easeIn",
@@ -710,7 +745,7 @@ export class BattleScene extends Phaser.Scene {
     this.warnRing.clear();
     this.enemyBody?.setAlpha(0.7);
     this.setEnemyFrame("broken");
-    this.spawnFloatText(ENEMY_X, ENEMY_Y - 90, "ガードブレイク!", "#ffd76a", 18);
+    this.spawnFloatText(ENEMY_X, ENEMY_Y - 90, "ガードブレイク!", "#f4b740", 18);
   }
 
   private killEnemy(): void {
@@ -727,12 +762,12 @@ export class BattleScene extends Phaser.Scene {
       if (fxOn) {
         for (let i = 0; i < 6; i++) {
           const star = this.add
-            .text(ENEMY_X, ENEMY_Y, "✦", { fontSize: "20px", color: "#ffd76a" })
+            .text(ENEMY_X, ENEMY_Y, "✦", { fontSize: "20px", color: i % 2 === 0 ? "#f26419" : "#f4b740" })
             .setOrigin(0.5);
           this.tweens.add({
             targets: star,
             x: ENEMY_X + Phaser.Math.Between(-90, 90),
-            y: ENEMY_Y + Phaser.Math.Between(-90, 60),
+            y: ENEMY_Y + Phaser.Math.Between(-110, 46),
             alpha: 0,
             duration: 500,
             onComplete: () => star.destroy(),
@@ -763,7 +798,7 @@ export class BattleScene extends Phaser.Scene {
     const y = PLAYER_Y + 58;
     this.chargeBar.fillStyle(0x000000, 0.5);
     this.chargeBar.fillRoundedRect(x, y, w, 10, 5);
-    const color = ratio >= 1 ? 0xffd76a : 0x6a8aff;
+    const color = ratio >= 1 ? 0xf4b740 : 0xf26419;
     this.chargeBar.fillStyle(color, 1);
     this.chargeBar.fillRoundedRect(x, y, Math.max(8, w * ratio), 10, 5);
   }
@@ -772,13 +807,13 @@ export class BattleScene extends Phaser.Scene {
     // 攻撃範囲予告 (§8.8): プレイヤー周囲に赤リング
     this.warnRing.clear();
     const urgency = Phaser.Math.Clamp(progress * progress, 0, 1);
-    const dangerColor = progress > 0.72 ? 0xff2626 : 0xff8a2a;
+    const dangerColor = progress > 0.72 ? 0xe8443b : 0xf26419;
     const playerRadius = Phaser.Math.Linear(62, 34, progress) + 4 * pulse;
     const enemyRadius = Phaser.Math.Linear(46, 62, progress) + 4 * pulse;
     const alpha = 0.42 + 0.48 * urgency;
 
     this.warnRing.lineStyle(2, dangerColor, 0.18 + 0.24 * urgency);
-    this.warnRing.lineBetween(ENEMY_X - 30, ENEMY_Y + 18, PLAYER_X + 36, PLAYER_Y - 18);
+    this.warnRing.lineBetween(ENEMY_X, ENEMY_Y + 38, PLAYER_X, PLAYER_Y - 46);
 
     this.warnRing.lineStyle(4, dangerColor, alpha);
     this.warnRing.strokeCircle(PLAYER_X, PLAYER_Y, playerRadius);
@@ -805,14 +840,14 @@ export class BattleScene extends Phaser.Scene {
 
     if (progress > 0.82) {
       const flashAlpha = Phaser.Math.Clamp((progress - 0.82) / 0.18, 0, 1) * (0.35 + 0.25 * pulse);
-      this.warnRing.fillStyle(0xff2626, flashAlpha);
+      this.warnRing.fillStyle(0xf26419, flashAlpha);
       this.warnRing.fillCircle(PLAYER_X, PLAYER_Y, 36);
     }
   }
 
   private updateGuardLabel(): void {
     if (!this.guardLabel) {
-      this.guardLabel = this.add.text(ENEMY_X + 58, ENEMY_Y - 42, "", { fontSize: "18px" }).setOrigin(0.5);
+      this.guardLabel = this.add.text(ENEMY_X + 52, ENEMY_Y - 58, "", { fontSize: "18px" }).setOrigin(0.5);
     }
     this.guardLabel.setText(this.guardHits > 0 ? `🛡×${this.guardHits}` : "");
   }

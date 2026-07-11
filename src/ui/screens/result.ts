@@ -19,7 +19,7 @@ export function renderResult(flow: GameFlow, result: ResultData, show: (el: HTML
   s.appendChild(el("h2", undefined, result.retired ? "🏳 リタイア" : "💀 力尽きた…"));
   if (result.newRecord && result.floor > 1) {
     const rec = el("div", "subtitle", "🎉 自己ベスト更新！");
-    rec.style.color = "#ffd76a";
+    rec.style.color = "var(--forge-molten)";
     s.appendChild(rec);
   }
 

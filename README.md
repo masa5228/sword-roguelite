@@ -56,3 +56,14 @@ npx vite preview --port 4173 --strictPort &
 node e2e/verify-run.mjs ./shots    # 通常プレイ一周
 node e2e/verify-boss.mjs ./shots   # ボス報酬・ドロップ売却・リタイア
 ```
+
+## フォント / ライセンス
+
+このプロジェクトは表示用フォントとして DotGothic16 をセルフホストしています。
+
+- Font: DotGothic16
+- License: SIL Open Font License 1.1
+- Author credit: Fontworks Inc.
+- Source: Google Fonts, https://fonts.google.com/specimen/DotGothic16
+- Distributed subset: fontsource DotGothic16 Japanese subset woff2, https://fontsource.org/fonts/dotgothic16
+- License text: `src/fonts/OFL.txt`

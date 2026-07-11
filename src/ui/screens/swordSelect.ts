@@ -31,7 +31,7 @@ export function renderSwordSelect(flow: GameFlow, characterType: CharacterType =
     card.appendChild(head);
     const desc = el("div", "sword-start-description", base.description);
     desc.style.fontSize = "13px";
-    desc.style.color = "#9a9ab8";
+    desc.style.color = "var(--forge-steel-dim)";
     desc.style.marginBottom = "8px";
     card.appendChild(desc);
     const stats = el(

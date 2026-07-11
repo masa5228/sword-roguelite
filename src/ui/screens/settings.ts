@@ -84,7 +84,7 @@ export function renderSettings(onBack: () => void): HTMLElement {
   const helpText = el("div");
   helpText.style.fontSize = "13px";
   helpText.style.lineHeight = "1.9";
-  helpText.style.color = "#b8b8d0";
+  helpText.style.color = "var(--forge-steel-dim)";
   helpText.innerHTML =
     "タップ … 通常攻撃<br>長押し（300ms以上）… 溜め攻撃、離して発動<br>左右スワイプ … 回避（短時間無敵）<br>敵の赤い予告が見えたら回避！<br>敵を倒すとコインを獲得、剣を強化できる<br>死亡するとコイン・剣・強化を失う";
   help.appendChild(helpText);

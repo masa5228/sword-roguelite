@@ -1,22 +1,22 @@
 let requested = false;
 
 type LockableOrientation = ScreenOrientation & {
-  lock?: (orientation: "landscape") => Promise<void>;
+  lock?: (orientation: "portrait") => Promise<void>;
 };
 
-async function lockLandscape(): Promise<void> {
+async function lockPortrait(): Promise<void> {
   const orientation = screen.orientation as LockableOrientation | undefined;
   if (!orientation?.lock) return;
 
   try {
-    await orientation.lock("landscape");
+    await orientation.lock("portrait");
   } catch {
-    // The portrait guard keeps the game hidden when platform policy blocks locking.
+    // The orientation guard keeps the game hidden when platform policy blocks locking.
   }
 }
 
-/** Request the browser's landscape game presentation from a user gesture. */
-export async function requestLandscapePresentation(): Promise<void> {
+/** Request the browser's portrait game presentation from a user gesture. */
+export async function requestPortraitPresentation(): Promise<void> {
   if (requested) return;
   requested = true;
 
@@ -29,10 +29,10 @@ export async function requestLandscapePresentation(): Promise<void> {
     }
   }
 
-  await lockLandscape();
+  await lockPortrait();
 }
 
-/** Reassert landscape after browser chrome or device orientation changes. */
-export function maintainLandscapeLock(): void {
-  void lockLandscape();
+/** Reassert portrait after browser chrome or device orientation changes. */
+export function maintainPortraitLock(): void {
+  void lockPortrait();
 }

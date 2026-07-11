@@ -4,7 +4,7 @@ import { BattleScene, GAME_HEIGHT, GAME_WIDTH } from "./game/scenes/BattleScene"
 import { GameFlow } from "./game/GameFlow";
 import { UIManager } from "./ui/UIManager";
 import { unlockAudio } from "./services/audioService";
-import { maintainLandscapeLock, requestLandscapePresentation } from "./services/displayService";
+import { maintainPortraitLock, requestPortraitPresentation } from "./services/displayService";
 
 // §7.4 iOS Safariのスクロール・拡大・長押しメニュー抑止
 document.addEventListener("gesturestart", (e) => e.preventDefault());
@@ -24,20 +24,20 @@ window.addEventListener(
   "pointerdown",
   () => {
     unlockAudio();
-    void requestLandscapePresentation();
+    void requestPortraitPresentation();
   },
   { once: true }
 );
-window.addEventListener("orientationchange", maintainLandscapeLock);
-document.addEventListener("fullscreenchange", maintainLandscapeLock);
-maintainLandscapeLock();
+window.addEventListener("orientationchange", maintainPortraitLock);
+document.addEventListener("fullscreenchange", maintainPortraitLock);
+maintainPortraitLock();
 
 const flow = new GameFlow();
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: "game-container",
-  backgroundColor: "#0a0a16",
+  backgroundColor: "#151210",
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,

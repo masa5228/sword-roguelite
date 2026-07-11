@@ -63,7 +63,7 @@ export function renderDexScreen(_flow: GameFlow, kind: "sword" | "enemy", onBack
       if (discovered) {
         const d = el("div", undefined, base.description);
         d.style.fontSize = "11px";
-        d.style.color = "#9a9ab8";
+        d.style.color = "var(--forge-steel-dim)";
         cell.appendChild(d);
       }
       grid.appendChild(cell);

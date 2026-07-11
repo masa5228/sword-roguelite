@@ -1,7 +1,7 @@
 // PWA Service Worker (§23.2 初回ロード後はオフラインでもプレイ可能)
 // 更新戦略: ナビゲーション(index.html)はネットワーク優先＝デプロイが再読み込みで反映される。
 // assets/ はファイル名にハッシュが付くためキャッシュ優先で安全。
-const CACHE_NAME = "sword-roguelite-v6";
+const CACHE_NAME = "sword-roguelite-v7";
 const PRECACHE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (event) => {
