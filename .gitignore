@@ -1,0 +1,11 @@
+node_modules/
+dist/
+tmp/
+artifacts/
+
+# Raw reference art used during asset generation (99MB, not consumed by the build;
+# runtime assets live under public/game-assets/)
+assets/
+
+# Tool-specific dirs that may hold local credentials/config
+.codex/
