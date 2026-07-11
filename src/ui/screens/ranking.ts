@@ -58,6 +58,7 @@ function renderTable(entries: RankingEntry[]): HTMLElement {
 // SC-012 ランキング画面
 export function renderRanking(flow: GameFlow): HTMLElement {
   const s = screenEl();
+  s.classList.add("ranking-screen");
   s.appendChild(el("h2", undefined, "🏆 ランキング"));
 
   if (!RANKING_ENABLED) {
@@ -91,7 +92,7 @@ export function renderRanking(flow: GameFlow): HTMLElement {
     content.appendChild(renderStatus("読み込み中…"));
     const selected = select.value as SwordType | "";
     try {
-      const rows = await fetchRanking(selected || undefined, 100);
+      const rows = await fetchRanking(selected || undefined, 50);
       content.innerHTML = "";
       content.appendChild(rows.length > 0 ? renderTable(rows) : renderStatus("まだ記録がありません"));
     } catch {
@@ -103,7 +104,6 @@ export function renderRanking(flow: GameFlow): HTMLElement {
   select.addEventListener("change", () => void load());
   void load();
 
-  s.appendChild(el("div", "spacer"));
   s.appendChild(button("← タイトルへ戻る", "menu-btn", () => flow.ui.showTitle()));
   return s;
 }

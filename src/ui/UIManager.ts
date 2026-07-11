@@ -37,6 +37,7 @@ export class UIManager implements UiPort {
   }
 
   showReward(): void {
+    this.hudHide();
     this.show(renderReward(this.flow));
   }
 

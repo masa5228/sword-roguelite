@@ -861,7 +861,29 @@ body {
 }
 
 .ranking-content {
-  min-height: 160px;
+  min-height: 0;
+}
+
+.ranking-screen {
+  overflow: hidden !important;
+}
+
+.ranking-screen .ranking-filter,
+.ranking-screen .ranking-home-btn {
+  flex: 0 0 auto;
+}
+
+.ranking-screen .ranking-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+.ranking-home-btn {
+  flex-shrink: 0;
 }
 
 .ranking-status,
