@@ -469,10 +469,11 @@ export class BattleScene extends Phaser.Scene {
     this.flow.ui.hudUpdate();
     playSfx("enemyHit");
 
-    // 特殊効果 (§8.3)
-    if (sword.effects.some((e) => e.type === "burn")) this.dot.burnUntil = this.clock + 3;
-    if (sword.effects.some((e) => e.type === "poison")) this.dot.poisonUntil = this.clock + 3;
-    const steal = lifestealRatio(sword);
+    // 杖の特殊効果は溜め攻撃時だけ発動 (§8.3)
+    const effectsActive = sword.type !== "arcaneStaff" || charged;
+    if (effectsActive && sword.effects.some((e) => e.type === "burn")) this.dot.burnUntil = this.clock + 3;
+    if (effectsActive && sword.effects.some((e) => e.type === "poison")) this.dot.poisonUntil = this.clock + 3;
+    const steal = effectsActive ? lifestealRatio(sword) : 0;
     if (steal > 0) this.flow.healPlayer(Math.max(1, Math.round(actual * steal)));
 
     // ヒット演出: ダメージ数字 + フラッシュ + ヒットストップ (§8.5)
