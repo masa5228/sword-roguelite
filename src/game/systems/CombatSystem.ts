@@ -50,7 +50,8 @@ export function estimateDps(sword: Sword): number {
 export function dotDamagePerTick(sword: Sword, type: "burn" | "poison"): number {
   const eff = sword.effects.find((e) => e.type === type);
   if (!eff) return 0;
-  return Math.max(1, Math.round(sword.attack * 0.12 * eff.level));
+  const effectPower = sword.type === "arcaneStaff" ? sword.attack * sword.chargeMultiplier : sword.attack;
+  return Math.max(1, Math.round(effectPower * 0.12 * eff.level));
 }
 
 export function lifestealRatio(sword: Sword): number {
