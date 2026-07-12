@@ -89,7 +89,7 @@ export function renderReward(flow: GameFlow): HTMLElement {
     list.appendChild(healBtn);
 
     s.appendChild(list);
-    s.appendChild(button("⏸ ポーズ", "menu-btn", () => flow.pause(() => flow.ui.showReward())));
+    s.appendChild(button("▣ ステータス", "menu-btn", () => flow.pause(() => flow.ui.showReward())));
     s.appendChild(el("div", "spacer"));
     s.appendChild(button("次の階層へ ▶", "menu-btn primary", () => flow.nextFloor()));
   };

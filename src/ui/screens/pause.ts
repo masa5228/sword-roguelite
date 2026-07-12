@@ -10,7 +10,7 @@ import { renderSettings } from "./settings";
 export function renderPause(flow: GameFlow, show: (el: HTMLElement) => void, onResume = () => flow.resumeBattle()): HTMLElement {
   const s = screenEl(true);
   const run = flow.run;
-  s.appendChild(el("h2", undefined, "⏸ ポーズ"));
+  s.appendChild(el("h2", undefined, "▣ ステータス"));
 
   if (run) {
     const isBoss = flow.currentEnemy?.role === "boss";
@@ -53,7 +53,7 @@ export function renderPause(flow: GameFlow, show: (el: HTMLElement) => void, onR
     s.appendChild(build);
   }
 
-  s.appendChild(button("▶ 戦闘へ戻る", "menu-btn primary", onResume));
+  s.appendChild(button("戻る", "menu-btn primary", onResume));
   s.appendChild(
     button("⚙ 設定", "menu-btn", () => show(renderSettings(() => flow.ui.showPause(onResume))))
   );

@@ -23,7 +23,7 @@ export function renderRelicReward(flow: GameFlow, relicIds: RelicId[]): HTMLElem
     grid.appendChild(card);
   }
   s.appendChild(grid);
-  s.appendChild(button("⏸ ポーズ", "menu-btn", () => flow.pause(() => flow.ui.showRelicReward(relicIds))));
+  s.appendChild(button("▣ ステータス", "menu-btn", () => flow.pause(() => flow.ui.showRelicReward(relicIds))));
   s.appendChild(button("今回は獲得しない", "menu-btn", () => flow.skipRelic()));
   return s;
 }

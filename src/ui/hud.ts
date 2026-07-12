@@ -87,7 +87,7 @@ export class Hud {
     bottom.appendChild(this.swordMini);
 
     const buttons = el("div", "hud-buttons");
-    const pauseBtn = button("⏸ ポーズ", "hud-btn", () => this.flow.pause());
+    const pauseBtn = button("▣ ステータス", "hud-btn", () => this.flow.pause());
     buttons.append(pauseBtn);
     bottom.appendChild(buttons);
 

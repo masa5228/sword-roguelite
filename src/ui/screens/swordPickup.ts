@@ -58,6 +58,6 @@ export function renderSwordPickup(flow: GameFlow, sword: Sword): HTMLElement {
     weaponPanel("CURRENT - KEEP", run.equippedSword, sword, false, () => flow.keepCurrentSword())
   );
   s.appendChild(comparison);
-  s.appendChild(button("⏸ ポーズ", "menu-btn", () => flow.pause(() => flow.ui.showSwordPickup(sword))));
+  s.appendChild(button("▣ ステータス", "menu-btn", () => flow.pause(() => flow.ui.showSwordPickup(sword))));
   return s;
 }
