@@ -53,7 +53,7 @@ export function renderDexScreen(_flow: GameFlow, kind: "sword" | "enemy", onBack
       const cell = el("div", `dex-cell${discovered ? "" : " locked"}`);
       if (discovered) {
         const icon = el("img", "dex-sprite") as HTMLImageElement;
-        icon.src = enemyFrameUrl(base.type, "idle");
+        icon.src = enemyFrameUrl(base.type === "bossKnight" ? base.type : base.spriteType, "idle");
         icon.alt = "";
         cell.appendChild(icon);
       } else {
@@ -82,7 +82,7 @@ export function renderDexScreen(_flow: GameFlow, kind: "sword" | "enemy", onBack
         if (!base || !info) continue;
         const cell = el("div", "dex-cell");
         const icon = el("img", "dex-sprite elite-sprite") as HTMLImageElement;
-        icon.src = enemyFrameUrl(base.type, "idle");
+        icon.src = enemyFrameUrl(base.spriteType, "idle");
         icon.alt = "";
         cell.appendChild(icon);
         cell.appendChild(el("div", undefined, `${info.nameJa}・${base.nameJa}`));

@@ -28,6 +28,14 @@ const ENEMY_X = 195;
 const ENEMY_Y = 300;
 const PLAYER_SWORD_OFFSET_X = 30;
 const PLAYER_SWORD_OFFSET_Y = -14;
+const ENEMY_TINTS: Partial<Record<EnemyKind, number>> = {
+  bat: 0x6e5aa8,
+  beetle: 0x4f8f8f,
+  wolf: 0x9b6b4a,
+  shaman: 0x4f78c9,
+  wraith: 0x9c7cff,
+  golem: 0x9a6b52,
+};
 
 // §7.4 誤操作対策
 const SWIPE_THRESHOLD_PX = 42;
@@ -108,7 +116,7 @@ export class BattleScene extends Phaser.Scene {
     const swordTypes: SwordType[] = ["longSword", "greatSword", "rapier", "katana", "twinBlade", "battleAxe", "warHammer", "spear", "whipBlade", "crystalSword", "cursedBlade", "sunBlade", "arcaneStaff"];
     for (const type of swordTypes) this.load.image(weaponKey(type), weaponUrl(type));
 
-    const normalEnemies: Exclude<EnemyKind, "bossKnight">[] = ["slime", "goblin", "skeleton", "orc", "mage"];
+    const normalEnemies = [...new Set(Object.values(ENEMY_BASES).map((base) => base.spriteType))];
     const enemyFrames: EnemyFrame[] = ["idle", "idleStep", "telegraph", "attack", "hurt", "broken", "defeat", "defeatAfter"];
     for (const type of normalEnemies) {
       for (const frame of enemyFrames) this.load.image(enemyFrameKey(type, frame), enemyFrameUrl(type, frame));
@@ -154,7 +162,7 @@ export class BattleScene extends Phaser.Scene {
     this.dodgeRecoverTimer = 0;
     this.charging = false;
     this.pointerActive = false;
-    this.guardHits = enemy.type === "skeleton" ? 3 : 0;
+    this.guardHits = enemy.type !== "bossKnight" && ENEMY_BASES[enemy.type].attackStyle === "guard" ? 3 : 0;
     this.regenTimer = 0;
     this.dot = { burnUntil: 0, poisonUntil: 0, nextTick: 0 };
     this.currentPattern = null;
@@ -172,10 +180,13 @@ export class BattleScene extends Phaser.Scene {
 
     const isGiant = enemy.eliteEffects.includes("giant");
     const scale = enemy.role === "boss" ? 1.32 : isGiant ? 1.7 : 1.35;
-    this.enemyBody = this.add.image(ENEMY_X, ENEMY_Y - 40, enemyFrameKey(enemy.type, "idle")).setOrigin(0.5).setScale(scale).setAlpha(0).setDepth(4).setFlipX(true);
+    const spriteType = enemy.type === "bossKnight" ? "bossKnight" : ENEMY_BASES[enemy.type].spriteType;
+    this.enemyBody = this.add.image(ENEMY_X, ENEMY_Y - 40, enemyFrameKey(spriteType, "idle")).setOrigin(0.5).setScale(scale).setAlpha(0).setDepth(4).setFlipX(true);
 
     if (enemy.role === "elite") {
       this.enemyBody.setTint(0xffd0d0);
+    } else if (ENEMY_TINTS[enemy.type]) {
+      this.enemyBody.setTint(ENEMY_TINTS[enemy.type]);
     }
 
     // 登場演出
@@ -226,7 +237,8 @@ export class BattleScene extends Phaser.Scene {
   private setEnemyFrame(frame: EnemyFrame | BossFrame): void {
     const type = this.flow.currentEnemy?.type;
     if (!type || !this.enemyBody) return;
-    this.enemyBody.setTexture(enemyFrameKey(type, frame));
+    const spriteType = type === "bossKnight" ? type : ENEMY_BASES[type].spriteType;
+    this.enemyBody.setTexture(enemyFrameKey(spriteType, frame));
   }
 
   // ===== 背景 =====
@@ -407,7 +419,7 @@ export class BattleScene extends Phaser.Scene {
 
     // スケルトンのガード (§12.3)
     let actual = damage;
-    if (enemy.type === "skeleton" && this.guardHits > 0 && this.enemyPhase !== "broken") {
+    if (enemy.type !== "bossKnight" && ENEMY_BASES[enemy.type].attackStyle === "guard" && this.guardHits > 0 && this.enemyPhase !== "broken") {
       this.guardHits -= 1;
       actual = Math.max(1, Math.round(damage * 0.15));
       this.spawnFloatText(ENEMY_X, ENEMY_Y - 70, "ガード!", "#88aaff", 16);

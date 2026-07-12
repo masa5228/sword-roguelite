@@ -41,7 +41,7 @@ export interface Sword {
   sellPrice: number;
 }
 
-export type EnemyKind = "slime" | "goblin" | "skeleton" | "orc" | "mage" | "bossKnight";
+export type EnemyKind = "slime" | "goblin" | "skeleton" | "orc" | "mage" | "bat" | "beetle" | "wolf" | "shaman" | "wraith" | "golem" | "bossKnight";
 export type EliteEffect = "giant" | "frenzy" | "regen"; // MVP 3種 (§12.4)
 export type EnemyRole = "normal" | "strong" | "elite" | "boss";
 
@@ -49,6 +49,7 @@ export interface Enemy {
   id: string;
   name: string;
   type: EnemyKind;
+  spriteType: EnemyKind;
   role: EnemyRole;
   floor: number;
   maxHp: number;
