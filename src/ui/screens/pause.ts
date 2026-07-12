@@ -40,10 +40,13 @@ export function renderPause(flow: GameFlow, show: (el: HTMLElement) => void, onR
       for (const id of run.relics) {
         const relic = RELICS[id];
         const item = el("div", "pause-relic-item");
+        const description = id === "bloodiedOil"
+          ? `${relic.description} 現在の蓄積: +${(run.bloodiedOilStacks ?? 0) * 8}%。`
+          : relic.description;
         item.append(
           el("div", "pause-relic-name", relic.name),
           el("div", "pause-relic-rarity", RELIC_RARITY_LABELS[relic.rarity]),
-          el("div", "pause-relic-description", relic.description)
+          el("div", "pause-relic-description", description)
         );
         relicList.appendChild(item);
       }

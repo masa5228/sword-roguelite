@@ -408,7 +408,12 @@ export class BattleScene extends Phaser.Scene {
 
     const result = rollAttackDamage(sword, multiplier * relicComboAttackMultiplier(relics, attackNumber));
     if (relics.includes("bloodiedOil")) {
-      run.bloodiedOilStacks = result.isCritical ? 0 : charged ? run.bloodiedOilStacks : Math.min(5, (run.bloodiedOilStacks ?? 0) + 1);
+      run.bloodiedOilStacks = result.isCritical ? 0 : Math.min(5, (run.bloodiedOilStacks ?? 0) + 1);
+      if (result.isCritical) {
+        this.spawnFloatText(PLAYER_X, PLAYER_Y - 96, "刃油リセット", "#f4b740", 14);
+      } else {
+        this.spawnFloatText(PLAYER_X, PLAYER_Y - 96, `刃油 +${run.bloodiedOilStacks * 8}%`, "#e88989", 14);
+      }
     }
     this.setPlayerFrame(charged ? "chargeRelease" : "attack");
     this.time.delayedCall(170, () => {
