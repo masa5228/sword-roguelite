@@ -81,6 +81,9 @@ export class BattleScene extends Phaser.Scene {
   private telegraphDuration = 1;
   private hitsRemaining = 0;
   private hitTimer = 0;
+  private comboHitIndex = 0;
+  private bossComboCooldown = 0;
+  private lastBossPatternId: string | null = null;
   private currentPattern: BossAttackPattern | null = null;
   private guardHits = 0;
   private regenTimer = 0;
@@ -155,6 +158,9 @@ export class BattleScene extends Phaser.Scene {
     this.regenTimer = 0;
     this.dot = { burnUntil: 0, poisonUntil: 0, nextTick: 0 };
     this.currentPattern = null;
+    this.comboHitIndex = 0;
+    this.bossComboCooldown = 0;
+    this.lastBossPatternId = null;
 
     this.drawBackground(enemy.floor);
     this.floorLabel.setText(bossHint ? "⚔ BOSS ⚔" : `${enemy.floor}F`);
@@ -516,6 +522,7 @@ export class BattleScene extends Phaser.Scene {
 
     if (this.state !== "fighting" || !this.flow.run || !this.flow.currentEnemy) return;
     const enemy = this.flow.currentEnemy;
+    this.bossComboCooldown = Math.max(0, this.bossComboCooldown - dt);
 
     // クールダウン・回避回復 (§8.7)
     this.attackCooldown = Math.max(0, this.attackCooldown - dt);
@@ -612,7 +619,7 @@ export class BattleScene extends Phaser.Scene {
         if (this.hitTimer <= 0 && this.hitsRemaining > 0) {
           this.hitsRemaining -= 1;
           this.executeStrike(enemy);
-          this.hitTimer = this.currentPattern?.hitInterval ?? 0.35;
+          this.hitTimer = this.currentPattern?.id === "combo" ? 0.55 : this.currentPattern?.hitInterval ?? 0.35;
         }
         if (this.hitsRemaining <= 0) {
           this.enemyPhase = "recover";
@@ -651,10 +658,15 @@ export class BattleScene extends Phaser.Scene {
 
     if (enemy.type === "bossKnight") {
       const hpRatio = enemy.currentHp / enemy.maxHp;
-      const available = BOSS_KNIGHT.patterns.filter((p) => hpRatio <= p.minHpRatio);
+      const available = BOSS_KNIGHT.patterns.filter(
+        (p) => hpRatio <= p.minHpRatio && (p.id !== "combo" || (this.bossComboCooldown <= 0 && this.lastBossPatternId !== "combo"))
+      );
       const pattern = available[Phaser.Math.Between(0, available.length - 1)];
       this.currentPattern = pattern;
-      this.phaseTimer = pattern.telegraphTime;
+      this.lastBossPatternId = pattern.id;
+      this.comboHitIndex = 0;
+      if (pattern.id === "combo") this.bossComboCooldown = 8;
+      this.phaseTimer = pattern.id === "combo" ? 1.25 : pattern.telegraphTime;
       this.strikeDamageMult = pattern.damageMultiplier;
       this.hitsRemaining = pattern.hits;
       this.spawnFloatText(ENEMY_X, ENEMY_Y - 110, pattern.nameJa, "#f26419", 18);
@@ -671,6 +683,8 @@ export class BattleScene extends Phaser.Scene {
 
   private executeStrike(enemy: Enemy): void {
     if (!this.enemyBody || !this.flow.run) return;
+    const hitIndex = this.comboHitIndex++;
+    const strikeDamageMult = this.currentPattern?.id === "combo" ? [0.7, 0.5, 0.3][hitIndex] ?? 0.3 : this.strikeDamageMult;
     const base = enemy.type !== "bossKnight" ? ENEMY_BASES[enemy.type] : null;
     const ranged = base?.attackStyle === "ranged";
     const bossFrame: BossFrame | null = this.currentPattern?.id === "sweep" ? "sweep" : this.currentPattern?.id === "smash" ? "smash" : this.currentPattern?.id === "rush" ? "rush" : this.currentPattern?.id === "combo" ? "combo" : null;
@@ -687,7 +701,7 @@ export class BattleScene extends Phaser.Scene {
         ease: "Quad.easeIn",
         onComplete: () => {
           proj.destroy();
-          this.resolvePlayerHit(enemy);
+          this.resolvePlayerHit(enemy, strikeDamageMult);
         },
       });
     } else {
@@ -699,12 +713,12 @@ export class BattleScene extends Phaser.Scene {
         duration: 160,
         yoyo: true,
         ease: "Quad.easeIn",
-        onYoyo: () => this.resolvePlayerHit(enemy),
+        onYoyo: () => this.resolvePlayerHit(enemy, strikeDamageMult),
       });
     }
   }
 
-  private resolvePlayerHit(enemy: Enemy): void {
+  private resolvePlayerHit(enemy: Enemy, strikeDamageMult = this.strikeDamageMult): void {
     if (this.state !== "fighting" || !this.flow.run) return;
 
     // 回避無敵 (§8.7) / 溜め中被弾で溜め解除 (§8.6)
@@ -721,7 +735,9 @@ export class BattleScene extends Phaser.Scene {
       this.spawnFloatText(PLAYER_X, PLAYER_Y - 90, "溜め解除", "#ff9a7a", 14);
     }
 
-    const dmg = playerDamageTaken(enemy.attack * this.strikeDamageMult, this.flow.run.defense);
+    const rawDamage = playerDamageTaken(enemy.attack * strikeDamageMult, this.flow.run.defense);
+    const isComboFinisher = this.currentPattern?.id === "combo" && this.comboHitIndex >= 3;
+    const dmg = isComboFinisher ? Math.min(rawDamage, Math.ceil(this.flow.run.playerMaxHp * 0.3)) : rawDamage;
     this.spawnFloatText(PLAYER_X, PLAYER_Y - 60, `-${dmg}`, "#ff7a7a", 24);
 
     const fxOn = loadSave().settings.graphicsQuality !== "low";
