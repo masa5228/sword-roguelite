@@ -104,7 +104,7 @@ export const ENEMY_BASES: Record<Exclude<EnemyKind, "bossKnight">, EnemyBase> = 
   },
   bat: {
     type: "bat",
-    spriteType: "goblin",
+    spriteType: "bat",
     nameJa: "コウモリ",
     icon: "🦇",
     baseHp: 18,
@@ -120,7 +120,7 @@ export const ENEMY_BASES: Record<Exclude<EnemyKind, "bossKnight">, EnemyBase> = 
   },
   beetle: {
     type: "beetle",
-    spriteType: "skeleton",
+    spriteType: "beetle",
     nameJa: "甲虫兵",
     icon: "🪲",
     baseHp: 65,
@@ -136,7 +136,7 @@ export const ENEMY_BASES: Record<Exclude<EnemyKind, "bossKnight">, EnemyBase> = 
   },
   wolf: {
     type: "wolf",
-    spriteType: "goblin",
+    spriteType: "wolf",
     nameJa: "狼牙獣",
     icon: "🐺",
     baseHp: 36,
@@ -152,7 +152,7 @@ export const ENEMY_BASES: Record<Exclude<EnemyKind, "bossKnight">, EnemyBase> = 
   },
   shaman: {
     type: "shaman",
-    spriteType: "mage",
+    spriteType: "shaman",
     nameJa: "呪術師",
     icon: "🔮",
     baseHp: 34,
@@ -168,7 +168,7 @@ export const ENEMY_BASES: Record<Exclude<EnemyKind, "bossKnight">, EnemyBase> = 
   },
   wraith: {
     type: "wraith",
-    spriteType: "mage",
+    spriteType: "wraith",
     nameJa: "亡霊",
     icon: "👻",
     baseHp: 28,
@@ -184,7 +184,7 @@ export const ENEMY_BASES: Record<Exclude<EnemyKind, "bossKnight">, EnemyBase> = 
   },
   golem: {
     type: "golem",
-    spriteType: "orc",
+    spriteType: "golem",
     nameJa: "岩石巨人",
     icon: "🗿",
     baseHp: 82,
