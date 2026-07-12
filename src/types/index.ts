@@ -5,6 +5,7 @@ export type SwordRarity = "common" | "rare" | "epic"; // MVPは3段階 (§9.2)
 export type EffectType = "burn" | "poison" | "lifesteal";
 
 export type CharacterType = "renon" | "hinata" | "kanata" | "rin";
+export type RelicId = "chargedCore" | "emberSigil" | "ironBark" | "luckyCoin" | "swiftSheath" | "bloodVial";
 
 export interface Character {
   type: CharacterType;
@@ -21,6 +22,13 @@ export interface Character {
 export interface SwordEffect {
   type: EffectType;
   level: number;
+}
+
+export interface Relic {
+  id: RelicId;
+  name: string;
+  rarity: "common" | "rare" | "boss";
+  description: string;
 }
 
 export interface Sword {
@@ -79,6 +87,7 @@ export interface RunState {
   maxDamage: number;
   startedAt: number;
   bestRarityFound: SwordRarity | null;
+  relics: RelicId[];
   seed: number;
 }
 

@@ -1,4 +1,4 @@
-import type { CharacterType, Enemy, ResultData, RunState, Sword, SwordType } from "../types";
+import type { CharacterType, Enemy, RelicId, ResultData, RunState, Sword, SwordType } from "../types";
 import { coinsForKill, createEnemyForFloor, enemyDexKey } from "./systems/DifficultySystem";
 import { generateSword, calcSellPrice, createStarterSword, rollDrop } from "./systems/DropSystem";
 import { applyUpgrade, healCost, HEAL_RATIO, type UpgradeKind } from "./systems/UpgradeSystem";
@@ -16,6 +16,8 @@ import {
 import { playSfx, vibrate } from "../services/audioService";
 import { BOSS_HEAL_RATIO, BOSS_REWARD_SWORD_COUNT } from "./data/bosses";
 import { CHARACTERS, DEFAULT_CHARACTER } from "./data/characters";
+import { RELICS, RELIC_LIMIT, hasRelic, relicChoices } from "./data/relics";
+import { relicDamageTakenMultiplier } from "./systems/RelicSystem";
 
 // §26.1 プレイヤー初期値
 export const PLAYER_MAX_HP = 100;
@@ -40,6 +42,7 @@ export interface UiPort {
   showReward(): void;
   showSwordPickup(sword: Sword): void;
   showBossReward(swords: Sword[]): void;
+  showRelicReward(relics: RelicId[]): void;
   showPause(): void;
   showResult(result: ResultData): void;
   showRanking(): void;
@@ -66,6 +69,7 @@ export class GameFlow {
   ui!: UiPort;
   currentEnemy: Enemy | null = null;
   private pendingDrop: Sword | null = null;
+  private pendingRelicContinue: (() => void) | null = null;
 
   // ===== 開始・再開 =====
 
@@ -91,6 +95,7 @@ export class GameFlow {
       maxDamage: 0,
       startedAt: Date.now(),
       bestRarityFound: null,
+      relics: [],
       seed: newSeed(),
     };
     discoverSword(`${sword.type}:${sword.rarity}`);
@@ -162,7 +167,7 @@ export class GameFlow {
   damagePlayer(amount: number): boolean {
     const run = this.run;
     if (!run) return false;
-    run.playerHp = Math.max(0, run.playerHp - amount);
+    run.playerHp = Math.max(0, run.playerHp - Math.round(amount * relicDamageTakenMultiplier(run.relics ?? [])));
     playSfx("playerHit");
     vibrate("playerHit");
     this.ui.hudUpdate();
@@ -190,6 +195,7 @@ export class GameFlow {
     const coins = coinsForKill(enemy);
     run.coins += coins;
     run.totalCoinsEarned += coins;
+    if ((run.relics ?? []).includes("bloodVial")) this.healPlayer(Math.ceil(run.playerMaxHp * 0.05));
     playSfx("coin");
     this.ui.toast(`💰 +${coins} コイン`);
 
@@ -215,21 +221,25 @@ export class GameFlow {
         if (!s.tutorialCompleted) s.tutorialCompleted = true;
       });
       const swords = Array.from({ length: BOSS_REWARD_SWORD_COUNT }, () => generateSword(run.floor));
-      this.ui.showBossReward(swords);
+      this.offerRelic(true, () => this.ui.showBossReward(swords));
       return;
     }
 
     // §9.3 剣ドロップ判定
-    if (rollDrop(enemy)) {
-      const sword = generateSword(run.floor);
-      this.pendingDrop = sword;
-      const isRare = sword.rarity !== "common";
-      playSfx(isRare ? "rareDrop" : "drop");
-      if (isRare) vibrate("rareGet");
-      this.ui.showSwordPickup(sword);
-    } else {
-      this.ui.showReward();
-    }
+    const continueReward = (): void => {
+      if (rollDrop(enemy)) {
+        const sword = generateSword(run.floor);
+        this.pendingDrop = sword;
+        const isRare = sword.rarity !== "common";
+        playSfx(isRare ? "rareDrop" : "drop");
+        if (isRare) vibrate("rareGet");
+        this.ui.showSwordPickup(sword);
+      } else {
+        this.ui.showReward();
+      }
+    };
+    if (enemy.role === "elite" || Math.random() < 0.015) this.offerRelic(false, continueReward);
+    else continueReward();
   }
 
   onPlayerDied(): void {
@@ -341,6 +351,33 @@ export class GameFlow {
     this.ui.hudShow();
     this.ui.hudUpdate();
     this.battle.setPaused(false);
+  }
+
+  obtainRelic(id: RelicId): void {
+    const run = this.run;
+    if (!run || (run.relics ?? []).length >= RELIC_LIMIT || hasRelic(run.relics ?? [], id)) return;
+    run.relics = [...(run.relics ?? []), id];
+    this.ui.toast(`レリック「${RELICS[id].name}」を獲得`);
+    const next = this.pendingRelicContinue;
+    this.pendingRelicContinue = null;
+    next?.();
+  }
+
+  skipRelic(): void {
+    const next = this.pendingRelicContinue;
+    this.pendingRelicContinue = null;
+    next?.();
+  }
+
+  private offerRelic(boss: boolean, continueWith: () => void): void {
+    this.pendingRelicContinue = continueWith;
+    const choices = relicChoices(3, boss, this.run?.relics ?? []);
+    if (choices.length === 0) {
+      this.pendingRelicContinue = null;
+      continueWith();
+      return;
+    }
+    this.ui.showRelicReward(choices.map((relic) => relic.id));
   }
 
   retire(): void {

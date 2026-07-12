@@ -9,6 +9,7 @@ import { renderBossReward } from "./screens/bossReward";
 import { renderPause } from "./screens/pause";
 import { renderResult } from "./screens/result";
 import { renderRanking } from "./screens/ranking";
+import { renderRelicReward } from "./screens/relicReward";
 
 // §19 画面遷移を担うDOMオーバーレイ管理
 export class UIManager implements UiPort {
@@ -48,6 +49,10 @@ export class UIManager implements UiPort {
 
   showBossReward(swords: Sword[]): void {
     this.show(renderBossReward(this.flow, swords));
+  }
+
+  showRelicReward(relics: import("../types").RelicId[]): void {
+    this.show(renderRelicReward(this.flow, relics));
   }
 
   showPause(): void {

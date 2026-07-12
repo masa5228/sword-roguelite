@@ -661,6 +661,53 @@ body {
   border-color: color-mix(in srgb, var(--forge-molten) 46%, var(--forge-line));
 }
 
+.relic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.relic-card {
+  min-width: 0;
+  min-height: 148px;
+  padding: 12px;
+  border: 2px solid var(--forge-sapphire);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--forge-plate-2), var(--forge-plate));
+  color: var(--forge-steel);
+  text-align: left;
+}
+
+.relic-card:active:not(:disabled) {
+  transform: scale(0.98);
+  border-color: var(--forge-molten);
+}
+
+.relic-card:disabled {
+  opacity: 0.35;
+}
+
+.relic-card-rarity {
+  color: var(--forge-sapphire);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.relic-card-name {
+  margin-top: 8px;
+  color: var(--forge-molten);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.relic-card-description {
+  margin-top: 8px;
+  color: var(--forge-steel-dim);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .weapon-comparison {
   display: grid;
   grid-template-columns: 1fr;

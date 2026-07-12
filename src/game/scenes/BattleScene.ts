@@ -17,6 +17,7 @@ import { BOSS_KNIGHT, type BossAttackPattern } from "../data/bosses";
 import { playSfx, vibrate } from "../../services/audioService";
 import { loadSave } from "../../services/saveService";
 import { applyCharacterToSword, characterChargeMaxMs, characterChargeStartMs } from "../systems/CharacterSystem";
+import { applyRelicsToSword, relicStatusDamageMultiplier } from "../systems/RelicSystem";
 import { characterFrameKey, characterFrameUrl, enemyFrameKey, enemyFrameUrl, weaponKey, weaponUrl, type BossFrame, type EnemyFrame, type PlayerFrame } from "../assets";
 
 export const GAME_WIDTH = 390;
@@ -367,7 +368,7 @@ export class BattleScene extends Phaser.Scene {
 
   private tryAttack(multiplier: number, charged: boolean): void {
     if (this.state !== "fighting" || this.attackCooldown > 0 || !this.flow.run || !this.flow.currentEnemy) return;
-    const sword = applyCharacterToSword(this.flow.run.equippedSword, this.flow.run.character);
+    const sword = applyRelicsToSword(applyCharacterToSword(this.flow.run.equippedSword, this.flow.run.character), this.flow.run.relics ?? []);
     this.attackCooldownMax = 1 / sword.attackSpeed;
     this.attackCooldown = this.attackCooldownMax;
     this.flow.ui.hudUpdateAttackCooldown(this.attackCooldown, this.attackCooldownMax);
@@ -405,7 +406,7 @@ export class BattleScene extends Phaser.Scene {
   private releaseChargeAttack(heldMs: number): void {
     if (!this.flow.run) return;
     const character = this.flow.run.character;
-    const sword = applyCharacterToSword(this.flow.run.equippedSword, character);
+    const sword = applyRelicsToSword(applyCharacterToSword(this.flow.run.equippedSword, character), this.flow.run.relics ?? []);
     const chargeTimeMultiplier = sword.chargeTimeMultiplier ?? 1;
     const maxMs = characterChargeMaxMs(CHARGE_MAX_MS * chargeTimeMultiplier, character);
     const startMs = characterChargeStartMs(CHARGE_START_MS * chargeTimeMultiplier, character);
@@ -571,10 +572,11 @@ export class BattleScene extends Phaser.Scene {
     // 継続ダメージ (炎上・毒)
     if ((this.dot.burnUntil > this.clock || this.dot.poisonUntil > this.clock) && this.clock >= this.dot.nextTick) {
       this.dot.nextTick = this.clock + 1;
-      const sword = applyCharacterToSword(run.equippedSword, run.character);
+       const sword = applyRelicsToSword(applyCharacterToSword(run.equippedSword, run.character), run.relics ?? []);
       let dotDmg = 0;
-      if (this.dot.burnUntil > this.clock) dotDmg += dotDamagePerTick(sword, "burn");
-      if (this.dot.poisonUntil > this.clock) dotDmg += dotDamagePerTick(sword, "poison");
+       if (this.dot.burnUntil > this.clock) dotDmg += dotDamagePerTick(sword, "burn");
+       if (this.dot.poisonUntil > this.clock) dotDmg += dotDamagePerTick(sword, "poison");
+       dotDmg = Math.round(dotDmg * relicStatusDamageMultiplier(run.relics ?? []));
       if (dotDmg > 0) {
         enemy.currentHp = Math.max(0, enemy.currentHp - dotDmg);
         this.spawnFloatText(ENEMY_X + 40, ENEMY_Y - 44, `${dotDmg}`, "#f26419", 16);
