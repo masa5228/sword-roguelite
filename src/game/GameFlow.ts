@@ -43,7 +43,7 @@ export interface UiPort {
   showSwordPickup(sword: Sword): void;
   showBossReward(swords: Sword[]): void;
   showRelicReward(relics: RelicId[]): void;
-  showPause(): void;
+  showPause(onResume?: () => void): void;
   showResult(result: ResultData): void;
   showRanking(): void;
   closeScreen(): void;
@@ -364,9 +364,9 @@ export class GameFlow {
     this.startFloor();
   }
 
-  pause(): void {
+  pause(onResume: () => void = () => this.resumeBattle()): void {
     this.battle.setPaused(true);
-    this.ui.showPause();
+    this.ui.showPause(onResume);
   }
 
   resumeBattle(): void {

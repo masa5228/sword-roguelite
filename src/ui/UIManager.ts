@@ -55,8 +55,8 @@ export class UIManager implements UiPort {
     this.show(renderRelicReward(this.flow, relics));
   }
 
-  showPause(): void {
-    this.show(renderPause(this.flow, this.show));
+  showPause(onResume?: () => void): void {
+    this.show(renderPause(this.flow, this.show, onResume));
   }
 
   showResult(result: ResultData): void {

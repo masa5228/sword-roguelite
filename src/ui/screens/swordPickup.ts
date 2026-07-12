@@ -2,7 +2,7 @@ import type { GameFlow } from "../../game/GameFlow";
 import { estimateDps } from "../../game/systems/CombatSystem";
 import { weaponUrl } from "../../game/assets";
 import type { Sword } from "../../types";
-import { el, rarityTag, screenEl } from "../components";
+import { button, el, rarityTag, screenEl } from "../components";
 
 function comparisonValue(value: number, other: number, format: (n: number) => string): HTMLElement {
   const result = el("span", "weapon-stat-value", format(value));
@@ -58,5 +58,6 @@ export function renderSwordPickup(flow: GameFlow, sword: Sword): HTMLElement {
     weaponPanel("CURRENT - KEEP", run.equippedSword, sword, false, () => flow.keepCurrentSword())
   );
   s.appendChild(comparison);
+  s.appendChild(button("⏸ ポーズ", "menu-btn", () => flow.pause(() => flow.ui.showSwordPickup(sword))));
   return s;
 }

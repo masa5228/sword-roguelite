@@ -21,6 +21,7 @@ export function renderBossReward(flow: GameFlow, swords: Sword[]): HTMLElement {
     s.appendChild(wrap);
   }
 
+  s.appendChild(button("⏸ ポーズ", "menu-btn", () => flow.pause(() => flow.ui.showBossReward(swords))));
   s.appendChild(button("受け取らない（現在の剣を維持）", "menu-btn", () => flow.skipBossReward()));
   return s;
 }

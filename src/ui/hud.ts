@@ -1,9 +1,8 @@
 import type { GameFlow } from "../game/GameFlow";
 import { dodgeChargesFor } from "../game/GameFlow";
-import { SWORD_BASES } from "../game/data/swords";
 import { maxLevel } from "../game/systems/UpgradeSystem";
 import { characterFrameUrl, weaponUrl } from "../game/assets";
-import { el, button, swordStatsTable } from "./components";
+import { el, button } from "./components";
 
 // §18 戦闘画面レイアウト: 上=階層/コイン/敵HP、下=HP/回避/剣情報/ポーズ
 
@@ -23,8 +22,6 @@ export class Hud {
   private playerPortrait!: HTMLImageElement;
   private cooldownFill!: HTMLElement;
   private cooldownLabel!: HTMLElement;
-  private detailPop!: HTMLElement;
-  private detailVisible = false;
 
   constructor(private flow: GameFlow) {
     this.root = document.getElementById("hud-root")!;
@@ -56,10 +53,6 @@ export class Hud {
 
     // 下部
     const bottom = el("div", "hud-bottom");
-
-    this.detailPop = el("div", "sword-detail-pop");
-    this.detailPop.style.display = "none";
-    bottom.appendChild(this.detailPop);
 
     const playerRow = el("div", "player-status-row");
     this.playerPortrait = el("img", "player-portrait") as HTMLImageElement;
@@ -94,28 +87,11 @@ export class Hud {
     bottom.appendChild(this.swordMini);
 
     const buttons = el("div", "hud-buttons");
-    const swordBtn = button("⚔ 剣情報", "hud-btn", () => this.toggleDetail());
     const pauseBtn = button("⏸ ポーズ", "hud-btn", () => this.flow.pause());
-    buttons.append(swordBtn, pauseBtn);
+    buttons.append(pauseBtn);
     bottom.appendChild(buttons);
 
     this.root.appendChild(bottom);
-  }
-
-  /** 剣の詳細数値はタップ時のみ展開 (§18.1) */
-  private toggleDetail(): void {
-    this.detailVisible = !this.detailVisible;
-    if (this.detailVisible && this.flow.run) {
-      this.detailPop.innerHTML = "";
-      const sword = this.flow.run.equippedSword;
-      const title = el("div", undefined, `${SWORD_BASES[sword.type].icon} ${sword.name}`);
-      title.style.fontWeight = "700";
-      this.detailPop.appendChild(title);
-      this.detailPop.appendChild(swordStatsTable(sword, undefined, this.flow.run.character));
-      this.detailPop.style.display = "block";
-    } else {
-      this.detailPop.style.display = "none";
-    }
   }
 
   show(): void {
@@ -124,8 +100,6 @@ export class Hud {
 
   hide(): void {
     this.root.classList.remove("visible");
-    this.detailVisible = false;
-    this.detailPop.style.display = "none";
   }
 
   update(): void {
@@ -164,10 +138,6 @@ export class Hud {
     this.playerPortrait.src = characterFrameUrl(run.character.type, "idle");
     this.swordIcon.src = weaponUrl(sword.type);
     this.swordLabel.textContent = `${sword.name} Lv.${sword.level}`;
-    if (this.detailVisible) {
-      this.detailVisible = false;
-      this.toggleDetail();
-    }
   }
 
   updateAttackCooldown(remaining: number, total: number): void {

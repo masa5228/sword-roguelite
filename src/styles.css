@@ -708,6 +708,93 @@ body {
   line-height: 1.5;
 }
 
+.pause-build-grid {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.pause-build-panel {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--forge-line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--forge-plate) 88%, transparent);
+}
+
+.pause-build-panel h3 {
+  margin: 0 0 9px;
+  color: var(--forge-molten);
+  font-size: 15px;
+}
+
+.pause-weapon-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  margin-bottom: 8px;
+  color: var(--forge-steel);
+}
+
+.pause-weapon-icon {
+  width: 46px;
+  height: 34px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: var(--forge-anvil);
+  border: 1px solid var(--forge-line);
+  border-radius: var(--radius);
+}
+
+.pause-build-panel .stat-table {
+  margin: 0;
+  font-size: 12px;
+}
+
+.pause-build-panel .stat-table td {
+  padding: 5px 6px;
+}
+
+.pause-relic-list {
+  display: grid;
+  gap: 7px;
+}
+
+.pause-relic-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 8px;
+  padding: 8px;
+  border-left: 3px solid var(--forge-sapphire);
+  background: color-mix(in srgb, var(--forge-anvil) 42%, transparent);
+}
+
+.pause-relic-name {
+  color: var(--forge-steel);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pause-relic-rarity {
+  color: var(--forge-sapphire);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.pause-relic-description {
+  grid-column: 1 / -1;
+  color: var(--forge-steel-dim);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.pause-empty {
+  color: var(--forge-steel-dim);
+  font-size: 13px;
+}
+
 .weapon-comparison {
   display: grid;
   grid-template-columns: 1fr;
