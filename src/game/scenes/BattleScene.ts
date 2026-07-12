@@ -405,9 +405,10 @@ export class BattleScene extends Phaser.Scene {
   private releaseChargeAttack(heldMs: number): void {
     if (!this.flow.run) return;
     const character = this.flow.run.character;
-    const maxMs = characterChargeMaxMs(CHARGE_MAX_MS, character);
-    const startMs = characterChargeStartMs(CHARGE_START_MS, character);
     const sword = applyCharacterToSword(this.flow.run.equippedSword, character);
+    const chargeTimeMultiplier = sword.chargeTimeMultiplier ?? 1;
+    const maxMs = characterChargeMaxMs(CHARGE_MAX_MS * chargeTimeMultiplier, character);
+    const startMs = characterChargeStartMs(CHARGE_START_MS * chargeTimeMultiplier, character);
     const mult = chargeMultiplier(sword, Math.min(heldMs, maxMs), startMs, maxMs);
     this.tryAttack(mult, true);
   }
@@ -554,8 +555,9 @@ export class BattleScene extends Phaser.Scene {
     // 溜め表示 (§8.6 300ms以上で溜め開始)
     if (this.pointerActive && !this.swipeConsumed) {
       const heldMs = (this.clock - this.pointerDownAt) * 1000;
-      const startMs = characterChargeStartMs(CHARGE_START_MS, run.character);
-      const maxMs = characterChargeMaxMs(CHARGE_MAX_MS, run.character);
+      const chargeTimeMultiplier = run.equippedSword.chargeTimeMultiplier ?? 1;
+      const startMs = characterChargeStartMs(CHARGE_START_MS * chargeTimeMultiplier, run.character);
+      const maxMs = characterChargeMaxMs(CHARGE_MAX_MS * chargeTimeMultiplier, run.character);
       if (heldMs >= startMs && this.attackCooldown <= 0) {
         if (!this.charging) {
           this.charging = true;

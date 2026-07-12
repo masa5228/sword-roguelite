@@ -34,6 +34,7 @@ export interface Sword {
   criticalRate: number; // 0..1
   criticalMultiplier: number;
   chargeMultiplier: number; // 最大溜め倍率
+  chargeTimeMultiplier?: number;
   knockback: number;
   effects: SwordEffect[];
   basePrice: number;

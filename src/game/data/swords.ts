@@ -10,6 +10,7 @@ export interface SwordBase {
   criticalRate: number;
   criticalMultiplier: number;
   chargeMultiplier: number;
+  chargeTimeMultiplier?: number;
   knockback: number;
   guaranteedEffect?: EffectType;
   description: string;
@@ -61,7 +62,7 @@ export const SWORD_BASES: Record<SwordType, SwordBase> = {
   crystalSword: { type: "crystalSword", nameJa: "晶剣", icon: "💎", attack: 14, attackSpeed: 0.85, criticalRate: 0.15, criticalMultiplier: 1.9, chargeMultiplier: 3.0, knockback: 12, description: "会心と溜め攻撃に秀でた結晶の剣。" },
   cursedBlade: { type: "cursedBlade", nameJa: "呪剣", icon: "🩸", attack: 17, attackSpeed: 0.9, criticalRate: 0.2, criticalMultiplier: 2.1, chargeMultiplier: 2.8, knockback: 6, description: "会心に特化した危険な呪いの剣。" },
   sunBlade: { type: "sunBlade", nameJa: "陽刃", icon: "☀", attack: 16, attackSpeed: 1.0, criticalRate: 0.1, criticalMultiplier: 1.85, chargeMultiplier: 3.4, knockback: 16, description: "通常攻撃と溜め攻撃が安定した光の剣。" },
-  arcaneStaff: { type: "arcaneStaff", nameJa: "魔導杖", icon: "🔮", attack: 4, attackSpeed: 0.65, criticalRate: 0.08, criticalMultiplier: 1.7, chargeMultiplier: 5.6, knockback: 8, guaranteedEffect: "burn", description: "通常攻撃は弱いが、燃焼を伴う高倍率の溜め攻撃に特化した杖。" },
+  arcaneStaff: { type: "arcaneStaff", nameJa: "魔導杖", icon: "🔮", attack: 4, attackSpeed: 0.65, criticalRate: 0.08, criticalMultiplier: 1.7, chargeMultiplier: 10.5, chargeTimeMultiplier: 1.4, knockback: 8, guaranteedEffect: "burn", description: "通常攻撃は弱いが、燃焼を伴う高倍率の溜め攻撃に特化した杖。" },
 };
 
 // §9.2 レアリティ
