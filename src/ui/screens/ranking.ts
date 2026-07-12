@@ -27,13 +27,21 @@ function renderTable(entries: RankingEntry[]): HTMLElement {
   ["順位", "プレイヤー", "キャラ", "武器", "階層"].forEach((label) => headRow.appendChild(el("th", undefined, label)));
   thead.appendChild(headRow);
   table.appendChild(thead);
+  headRow.lastElementChild?.remove();
 
   const tbody = el("tbody");
   entries.forEach((entry, index) => {
     const tr = el("tr");
     if (currentName && entry.player_name === currentName) tr.classList.add("self");
     tr.appendChild(el("td", "rank-cell", String(index + 1)));
-    tr.appendChild(el("td", undefined, entry.player_name));
+    const player = el("td");
+    const playerBox = el("div", "ranking-player");
+    playerBox.append(
+      el("span", undefined, entry.player_name),
+      el("span", "ranking-player-floor", `${entry.floor}F`)
+    );
+    player.appendChild(playerBox);
+    tr.appendChild(player);
     tr.appendChild(el("td", undefined, entry.character_name));
 
     const weapon = el("td");
@@ -47,7 +55,6 @@ function renderTable(entries: RankingEntry[]): HTMLElement {
     weapon.appendChild(weaponBox);
     tr.appendChild(weapon);
 
-    tr.appendChild(el("td", "floor-cell", `${entry.floor}F`));
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);

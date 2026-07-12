@@ -976,10 +976,22 @@ body {
 }
 
 .rank-cell,
-.floor-cell {
+.ranking-player-floor {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.ranking-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 150px;
+}
+
+.ranking-player-floor {
+  color: var(--forge-molten);
 }
 
 .ranking-weapon {
