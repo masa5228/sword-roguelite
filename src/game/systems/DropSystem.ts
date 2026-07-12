@@ -1,17 +1,18 @@
 import type { Enemy, EffectType, Sword, SwordRarity, SwordType } from "../../types";
 import { EFFECT_PREFIXES, NAME_PREFIXES, RARITY_INFO, SWORD_BASES } from "../data/swords";
-import { BASE_DROP_RATE, ELITE_DROP_RATE } from "../data/enemies";
 import { pickWeighted } from "./rng";
 
 // §9.3 剣ドロップ率 / §9.4 剣生成
 
 let swordSeq = 0;
-const DROP_RATE_MULTIPLIER = 3;
+const NORMAL_DROP_RATE = 0.1;
+const ELITE_DROP_RATE = 0.6;
 
 export function rollDrop(enemy: Enemy, rand: () => number = Math.random): boolean {
   if (enemy.role === "boss") return true; // 100%
-  const baseRate = enemy.role === "elite" ? ELITE_DROP_RATE : BASE_DROP_RATE * enemy.dropMultiplier;
-  const rate = Math.min(1, baseRate * DROP_RATE_MULTIPLIER);
+  const rate = enemy.role === "elite"
+    ? ELITE_DROP_RATE
+    : Math.min(1, NORMAL_DROP_RATE * enemy.dropMultiplier);
   return rand() < rate;
 }
 
