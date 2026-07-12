@@ -23,6 +23,7 @@ export class UIManager implements UiPort {
   }
 
   private show = (el: HTMLElement): void => {
+    this.hudHide();
     this.root.innerHTML = "";
     this.root.appendChild(el);
   };

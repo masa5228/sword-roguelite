@@ -334,6 +334,8 @@ export class GameFlow {
 
   resumeBattle(): void {
     this.ui.closeScreen();
+    this.ui.hudShow();
+    this.ui.hudUpdate();
     this.battle.setPaused(false);
   }
 
