@@ -1,6 +1,6 @@
 import type { GameFlow } from "../../game/GameFlow";
 import type { RelicId } from "../../types";
-import { RELICS, RELIC_LIMIT } from "../../game/data/relics";
+import { RELICS, RELIC_LIMIT, RELIC_RARITY_LABELS } from "../../game/data/relics";
 import { button, el, screenEl } from "../components";
 
 export function renderRelicReward(flow: GameFlow, relicIds: RelicId[]): HTMLElement {
@@ -15,7 +15,7 @@ export function renderRelicReward(flow: GameFlow, relicIds: RelicId[]): HTMLElem
     const relic = RELICS[id];
     const card = button("", "relic-card", () => flow.obtainRelic(id));
     card.append(
-      el("div", "relic-card-rarity", relic.rarity.toUpperCase()),
+      el("div", "relic-card-rarity", RELIC_RARITY_LABELS[relic.rarity]),
       el("div", "relic-card-name", relic.name),
       el("div", "relic-card-description", relic.description)
     );

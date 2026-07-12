@@ -2,11 +2,17 @@ import type { Relic, RelicId } from "../../types";
 
 export const RELIC_LIMIT = 6;
 
+export const RELIC_RARITY_LABELS: Record<Relic["rarity"], string> = {
+  common: "ノーマル",
+  rare: "レア",
+  boss: "ボス限定",
+};
+
 export const RELICS: Record<RelicId, Relic> = {
   chargedCore: { id: "chargedCore", name: "蓄力核", rarity: "common", description: "溜め攻撃の最大倍率が18%上昇する。" },
   emberSigil: { id: "emberSigil", name: "熾火の印", rarity: "rare", description: "燃焼・毒の継続ダメージが25%上昇する。" },
   ironBark: { id: "ironBark", name: "鉄樹の皮", rarity: "common", description: "受けるダメージを10%軽減する。" },
-  luckyCoin: { id: "luckyCoin", name: "幸運貨", rarity: "rare", description: "会心率が5%上昇する。" },
+  luckyCoin: { id: "luckyCoin", name: "幸運のコイン", rarity: "rare", description: "会心率が5%上昇する。" },
   swiftSheath: { id: "swiftSheath", name: "疾風の鞘", rarity: "common", description: "攻撃速度が8%上昇する。" },
   bloodVial: { id: "bloodVial", name: "血瓶", rarity: "boss", description: "敵撃破時、最大HPの5%を回復する。" },
 };
