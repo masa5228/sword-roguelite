@@ -24,6 +24,10 @@ export const DODGE_CHARGES = 2;
 export const DODGE_INVINCIBLE_SEC = 0.35;
 export const DODGE_RECOVER_SEC = 3.0;
 
+export function dodgeChargesFor(characterType: CharacterType): number {
+  return characterType === "hinata" ? 3 : DODGE_CHARGES;
+}
+
 export interface BattlePort {
   startFloor(enemy: Enemy, bossHint: boolean): void;
   setPaused(paused: boolean): void;
@@ -77,7 +81,7 @@ export class GameFlow {
       playerHp: Math.round(PLAYER_MAX_HP * character.hpMultiplier),
       playerMaxHp: Math.round(PLAYER_MAX_HP * character.hpMultiplier),
       defense: PLAYER_DEFENSE,
-      dodgeCharges: DODGE_CHARGES,
+      dodgeCharges: dodgeChargesFor(character.type),
       coins: 0,
       equippedSword: sword,
       character,
@@ -107,7 +111,7 @@ export class GameFlow {
   startFloor(): void {
     const run = this.run;
     if (!run) return;
-    run.dodgeCharges = DODGE_CHARGES;
+    run.dodgeCharges = dodgeChargesFor(run.character.type);
     saveSuspend(run);
 
     // 乱数シード + 階層 から敵を決定論的に生成（再開時に同じ敵が出る）

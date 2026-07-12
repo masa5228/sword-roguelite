@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import type { CharacterType, Enemy, EnemyKind, SwordType } from "../../types";
 import type { GameFlow } from "../GameFlow";
-import { DODGE_CHARGES, DODGE_INVINCIBLE_SEC, DODGE_RECOVER_SEC } from "../GameFlow";
+import { dodgeChargesFor, DODGE_INVINCIBLE_SEC, DODGE_RECOVER_SEC } from "../GameFlow";
 import {
   CHARGE_MAX_MS,
   CHARGE_START_MS,
@@ -528,7 +528,7 @@ export class BattleScene extends Phaser.Scene {
     this.attackCooldown = Math.max(0, this.attackCooldown - dt);
     this.flow.ui.hudUpdateAttackCooldown(this.attackCooldown, this.attackCooldownMax);
     const run = this.flow.run;
-    if (run.dodgeCharges < DODGE_CHARGES) {
+    if (run.dodgeCharges < dodgeChargesFor(run.character.type)) {
       this.dodgeRecoverTimer += dt;
       if (this.dodgeRecoverTimer >= DODGE_RECOVER_SEC) {
         this.dodgeRecoverTimer = 0;

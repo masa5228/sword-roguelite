@@ -1,5 +1,5 @@
 import type { GameFlow } from "../game/GameFlow";
-import { DODGE_CHARGES } from "../game/GameFlow";
+import { dodgeChargesFor } from "../game/GameFlow";
 import { SWORD_BASES } from "../game/data/swords";
 import { maxLevel } from "../game/systems/UpgradeSystem";
 import { characterFrameUrl, weaponUrl } from "../game/assets";
@@ -152,7 +152,8 @@ export class Hud {
     this.hpBarLabel.textContent = `HP ${run.playerHp} / ${run.playerMaxHp}`;
 
     this.dodgeDots.innerHTML = "";
-    for (let i = 0; i < DODGE_CHARGES; i++) {
+    const maxDodgeCharges = dodgeChargesFor(run.character.type);
+    for (let i = 0; i < maxDodgeCharges; i++) {
       this.dodgeDots.appendChild(el("span", `dodge-dot${i < run.dodgeCharges ? " full" : ""}`));
     }
 
