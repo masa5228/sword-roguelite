@@ -19,7 +19,15 @@ export type RelicId =
   | "heavyCloak"
   | "comboTalisman"
   | "revivalStone"
-  | "bossEmblem";
+  | "bossEmblem"
+  | "giantHeart"
+  | "aegisPlate"
+  | "warBanner"
+  | "precisionLens"
+  | "overclockGear"
+  | "grandChargeCore"
+  | "berserkerCrest"
+  | "titanGrip";
 
 export interface Character {
   type: CharacterType;

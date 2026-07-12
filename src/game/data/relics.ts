@@ -23,6 +23,14 @@ export const RELICS: Record<RelicId, Relic> = {
   comboTalisman: { id: "comboTalisman", name: "連撃の護符", rarity: "rare", description: "同じ敵への3回目の連続攻撃が35%強くなる。" },
   revivalStone: { id: "revivalStone", name: "蘇生石", rarity: "boss", description: "1回だけ、死亡時に最大HPの20%で復活する。" },
   bossEmblem: { id: "bossEmblem", name: "ボスの紋章", rarity: "boss", description: "ボス戦のみ、攻撃力が15%、溜め倍率が20%上昇する。" },
+  giantHeart: { id: "giantHeart", name: "巨人の心臓", rarity: "common", description: "最大HPが25%増加する。取得時に現在HPも同じ割合で増加する。" },
+  aegisPlate: { id: "aegisPlate", name: "イージスの盾", rarity: "rare", description: "受けるダメージを30%軽減する。" },
+  warBanner: { id: "warBanner", name: "戦旗", rarity: "rare", description: "攻撃力が15%増加する。" },
+  precisionLens: { id: "precisionLens", name: "必中レンズ", rarity: "rare", description: "会心率が12%増加する。" },
+  overclockGear: { id: "overclockGear", name: "過回転ギア", rarity: "rare", description: "攻撃速度が20%増加する。" },
+  grandChargeCore: { id: "grandChargeCore", name: "大蓄力核", rarity: "rare", description: "最大溜め倍率が45%増加する代わりに、溜め時間が20%増加する。" },
+  berserkerCrest: { id: "berserkerCrest", name: "狂戦士の紋章", rarity: "boss", description: "HP40%以下のとき、攻撃力が40%増加する。" },
+  titanGrip: { id: "titanGrip", name: "巨神の握撃", rarity: "boss", description: "攻撃力が25%増加する代わりに、攻撃速度が15%低下する。" },
 };
 
 export function hasRelic(relics: RelicId[], id: RelicId): boolean {

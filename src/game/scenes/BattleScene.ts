@@ -380,7 +380,7 @@ export class BattleScene extends Phaser.Scene {
     const relics = run.relics ?? [];
     const isBoss = this.flow.currentEnemy.role === "boss";
     const attackNumber = this.sameEnemyAttackCount + 1;
-    const sword = applyRelicsToSwordForContext(applyCharacterToSword(run.equippedSword, run.character), relics, isBoss);
+    const sword = applyRelicsToSwordForContext(applyCharacterToSword(run.equippedSword, run.character), relics, isBoss, run.playerHp / run.playerMaxHp);
     if (!charged) {
       sword.criticalRate = Math.min(0.8, sword.criticalRate + relicBloodiedOilCritBonus(relics, run.bloodiedOilStacks ?? 0));
     }
@@ -428,7 +428,8 @@ export class BattleScene extends Phaser.Scene {
     const sword = applyRelicsToSwordForContext(
       applyCharacterToSword(this.flow.run.equippedSword, character),
       this.flow.run.relics ?? [],
-      this.flow.currentEnemy?.role === "boss"
+      this.flow.currentEnemy?.role === "boss",
+      this.flow.run.playerHp / this.flow.run.playerMaxHp
     );
     const chargeTimeMultiplier = sword.chargeTimeMultiplier ?? 1;
     const maxMs = characterChargeMaxMs(CHARGE_MAX_MS * chargeTimeMultiplier, character);
@@ -582,7 +583,8 @@ export class BattleScene extends Phaser.Scene {
       const chargeSword = applyRelicsToSwordForContext(
         applyCharacterToSword(run.equippedSword, run.character),
         run.relics ?? [],
-        enemy.role === "boss"
+        enemy.role === "boss",
+        run.playerHp / run.playerMaxHp
       );
       const chargeTimeMultiplier = chargeSword.chargeTimeMultiplier ?? 1;
       const startMs = characterChargeStartMs(CHARGE_START_MS * chargeTimeMultiplier, run.character);
@@ -603,7 +605,8 @@ export class BattleScene extends Phaser.Scene {
        const sword = applyRelicsToSwordForContext(
          applyCharacterToSword(run.equippedSword, run.character),
          run.relics ?? [],
-         enemy.role === "boss"
+         enemy.role === "boss",
+         run.playerHp / run.playerMaxHp
        );
        let dotDmg = 0;
        if (this.dot.burnUntil > this.clock) dotDmg += dotDamagePerTick(sword, "burn");

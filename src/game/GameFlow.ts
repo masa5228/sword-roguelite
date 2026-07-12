@@ -380,6 +380,11 @@ export class GameFlow {
     const run = this.run;
     if (!run || (run.relics ?? []).length >= RELIC_LIMIT || hasRelic(run.relics ?? [], id)) return;
     run.relics = [...(run.relics ?? []), id];
+    if (id === "giantHeart") {
+      run.playerMaxHp = Math.round(run.playerMaxHp * 1.25);
+      run.playerHp = Math.min(run.playerMaxHp, Math.round(run.playerHp * 1.25));
+      this.ui.hudUpdate();
+    }
     this.ui.toast(`レリック「${RELICS[id].name}」を獲得`);
     const next = this.pendingRelicContinue;
     this.pendingRelicContinue = null;
