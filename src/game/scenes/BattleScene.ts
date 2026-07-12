@@ -130,7 +130,7 @@ export class BattleScene extends Phaser.Scene {
     this.playerSword = this.add.image(PLAYER_X + PLAYER_SWORD_OFFSET_X, PLAYER_Y + PLAYER_SWORD_OFFSET_Y, weaponKey("longSword")).setOrigin(0.5).setScale(0.23).setDepth(5);
     this.playerSword.setAngle(-25);
 
-    this.chargeBar = this.add.graphics();
+    this.chargeBar = this.add.graphics().setDepth(9);
 
     // §7.2 入力: タップ=攻撃 / 長押し=溜め / 左右スワイプ=回避
     this.input.on("pointerdown", this.onPointerDown, this);
@@ -793,14 +793,17 @@ export class BattleScene extends Phaser.Scene {
 
   private drawChargeBar(ratio: number): void {
     this.chargeBar.clear();
-    const w = 124;
-    const x = PLAYER_X - 62;
-    const y = PLAYER_Y + 58;
+    const w = 140;
+    const h = 12;
+    const x = PLAYER_X - w / 2;
+    const y = PLAYER_Y - 112;
     this.chargeBar.fillStyle(0x000000, 0.5);
-    this.chargeBar.fillRoundedRect(x, y, w, 10, 5);
+    this.chargeBar.lineStyle(2, 0xf4b740, 0.9);
+    this.chargeBar.fillRoundedRect(x, y, w, h, 5);
+    this.chargeBar.strokeRoundedRect(x, y, w, h, 5);
     const color = ratio >= 1 ? 0xf4b740 : 0xf26419;
     this.chargeBar.fillStyle(color, 1);
-    this.chargeBar.fillRoundedRect(x, y, Math.max(8, w * ratio), 10, 5);
+    this.chargeBar.fillRoundedRect(x + 2, y + 2, Math.max(8, (w - 4) * ratio), h - 4, 3);
   }
 
   private drawWarnRing(progress: number, pulse: number): void {
