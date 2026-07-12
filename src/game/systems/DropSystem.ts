@@ -6,7 +6,7 @@ import { pickWeighted } from "./rng";
 // §9.3 剣ドロップ率 / §9.4 剣生成
 
 let swordSeq = 0;
-const DROP_RATE_MULTIPLIER = 2;
+const DROP_RATE_MULTIPLIER = 3;
 
 export function rollDrop(enemy: Enemy, rand: () => number = Math.random): boolean {
   if (enemy.role === "boss") return true; // 100%
@@ -21,8 +21,8 @@ export function generateSword(floor: number, rand: () => number = Math.random, f
   const rarity =
     forcedRarity ??
     pickWeighted<SwordRarity>(rand, [
-      ["common", RARITY_INFO.common.weight],
-      ["rare", RARITY_INFO.rare.weight + floor * 0.6],
+      ["common", 55],
+      ["rare", 40 + floor * 0.6],
       ["epic", RARITY_INFO.epic.weight + floor * 0.35],
     ]);
 
