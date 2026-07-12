@@ -6,10 +6,12 @@ import { pickWeighted } from "./rng";
 // §9.3 剣ドロップ率 / §9.4 剣生成
 
 let swordSeq = 0;
+const DROP_RATE_MULTIPLIER = 2;
 
 export function rollDrop(enemy: Enemy, rand: () => number = Math.random): boolean {
   if (enemy.role === "boss") return true; // 100%
-  const rate = enemy.role === "elite" ? ELITE_DROP_RATE : BASE_DROP_RATE * enemy.dropMultiplier;
+  const baseRate = enemy.role === "elite" ? ELITE_DROP_RATE : BASE_DROP_RATE * enemy.dropMultiplier;
+  const rate = Math.min(1, baseRate * DROP_RATE_MULTIPLIER);
   return rand() < rate;
 }
 

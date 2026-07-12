@@ -7,6 +7,8 @@ import { estimateDps } from "../../game/systems/CombatSystem";
 import { weaponUrl } from "../../game/assets";
 import { button, el, screenEl } from "../components";
 
+const STARTER_SWORD_TYPES: SwordType[] = ["longSword", "greatSword", "rapier"];
+
 // SC-002 初期剣選択画面
 export function renderSwordSelect(flow: GameFlow, characterType: CharacterType = "renon"): HTMLElement {
   const s = screenEl();
@@ -15,7 +17,7 @@ export function renderSwordSelect(flow: GameFlow, characterType: CharacterType =
   s.appendChild(el("div", "subtitle", `${character.name} とともに冒険を始める`));
 
   const choices = el("div", "sword-select-grid");
-  (Object.keys(SWORD_BASES) as SwordType[]).forEach((type) => {
+  STARTER_SWORD_TYPES.forEach((type) => {
     const base = SWORD_BASES[type];
     const sword = createStarterSword(type);
     const card = el("div", "card sword-start-card");
