@@ -17,7 +17,13 @@ import { BOSS_KNIGHT, type BossAttackPattern } from "../data/bosses";
 import { playSfx, vibrate } from "../../services/audioService";
 import { loadSave } from "../../services/saveService";
 import { applyCharacterToSword, characterChargeMaxMs, characterChargeStartMs } from "../systems/CharacterSystem";
-import { applyRelicsToSword, relicStatusDamageMultiplier } from "../systems/RelicSystem";
+import {
+  applyRelicsToSwordForContext,
+  relicBloodiedOilCritBonus,
+  relicComboAttackMultiplier,
+  relicStaffStatusDamageMultiplier,
+  relicStatusDamageMultiplier,
+} from "../systems/RelicSystem";
 import { characterFrameKey, characterFrameUrl, enemyFrameKey, enemyFrameUrl, weaponKey, weaponUrl, type BossFrame, type EnemyFrame, type PlayerFrame } from "../assets";
 
 export const GAME_WIDTH = 390;
@@ -91,6 +97,7 @@ export class BattleScene extends Phaser.Scene {
   private hitsRemaining = 0;
   private hitTimer = 0;
   private comboHitIndex = 0;
+  private sameEnemyAttackCount = 0;
   private bossComboCooldown = 0;
   private lastBossPatternId: string | null = null;
   private currentPattern: BossAttackPattern | null = null;
@@ -163,6 +170,7 @@ export class BattleScene extends Phaser.Scene {
     this.dodgeRecoverTimer = 0;
     this.charging = false;
     this.pointerActive = false;
+    this.sameEnemyAttackCount = 0;
     this.guardHits = enemy.type !== "bossKnight" && ENEMY_BASES[enemy.type].attackStyle === "guard" ? 3 : 0;
     this.regenTimer = 0;
     this.dot = { burnUntil: 0, poisonUntil: 0, nextTick: 0 };
@@ -368,7 +376,15 @@ export class BattleScene extends Phaser.Scene {
 
   private tryAttack(multiplier: number, charged: boolean): void {
     if (this.state !== "fighting" || this.attackCooldown > 0 || !this.flow.run || !this.flow.currentEnemy) return;
-    const sword = applyRelicsToSword(applyCharacterToSword(this.flow.run.equippedSword, this.flow.run.character), this.flow.run.relics ?? []);
+    const run = this.flow.run;
+    const relics = run.relics ?? [];
+    const isBoss = this.flow.currentEnemy.role === "boss";
+    const attackNumber = this.sameEnemyAttackCount + 1;
+    const sword = applyRelicsToSwordForContext(applyCharacterToSword(run.equippedSword, run.character), relics, isBoss);
+    if (!charged) {
+      sword.criticalRate = Math.min(0.8, sword.criticalRate + relicBloodiedOilCritBonus(relics, run.bloodiedOilStacks ?? 0));
+    }
+    this.sameEnemyAttackCount = attackNumber;
     this.attackCooldownMax = 1 / sword.attackSpeed;
     this.attackCooldown = this.attackCooldownMax;
     this.flow.ui.hudUpdateAttackCooldown(this.attackCooldown, this.attackCooldownMax);
@@ -390,7 +406,10 @@ export class BattleScene extends Phaser.Scene {
       ease: "Quad.easeOut",
     });
 
-    const result = rollAttackDamage(sword, multiplier);
+    const result = rollAttackDamage(sword, multiplier * relicComboAttackMultiplier(relics, attackNumber));
+    if (relics.includes("bloodiedOil")) {
+      run.bloodiedOilStacks = result.isCritical ? 0 : charged ? run.bloodiedOilStacks : Math.min(5, (run.bloodiedOilStacks ?? 0) + 1);
+    }
     this.setPlayerFrame(charged ? "chargeRelease" : "attack");
     this.time.delayedCall(170, () => {
       if (this.state === "fighting" && !this.charging && !this.dodging) this.setPlayerFrame("idle");
@@ -406,7 +425,11 @@ export class BattleScene extends Phaser.Scene {
   private releaseChargeAttack(heldMs: number): void {
     if (!this.flow.run) return;
     const character = this.flow.run.character;
-    const sword = applyRelicsToSword(applyCharacterToSword(this.flow.run.equippedSword, character), this.flow.run.relics ?? []);
+    const sword = applyRelicsToSwordForContext(
+      applyCharacterToSword(this.flow.run.equippedSword, character),
+      this.flow.run.relics ?? [],
+      this.flow.currentEnemy?.role === "boss"
+    );
     const chargeTimeMultiplier = sword.chargeTimeMultiplier ?? 1;
     const maxMs = characterChargeMaxMs(CHARGE_MAX_MS * chargeTimeMultiplier, character);
     const startMs = characterChargeStartMs(CHARGE_START_MS * chargeTimeMultiplier, character);
@@ -556,7 +579,12 @@ export class BattleScene extends Phaser.Scene {
     // 溜め表示 (§8.6 300ms以上で溜め開始)
     if (this.pointerActive && !this.swipeConsumed) {
       const heldMs = (this.clock - this.pointerDownAt) * 1000;
-      const chargeTimeMultiplier = run.equippedSword.chargeTimeMultiplier ?? 1;
+      const chargeSword = applyRelicsToSwordForContext(
+        applyCharacterToSword(run.equippedSword, run.character),
+        run.relics ?? [],
+        enemy.role === "boss"
+      );
+      const chargeTimeMultiplier = chargeSword.chargeTimeMultiplier ?? 1;
       const startMs = characterChargeStartMs(CHARGE_START_MS * chargeTimeMultiplier, run.character);
       const maxMs = characterChargeMaxMs(CHARGE_MAX_MS * chargeTimeMultiplier, run.character);
       if (heldMs >= startMs && this.attackCooldown <= 0) {
@@ -572,11 +600,16 @@ export class BattleScene extends Phaser.Scene {
     // 継続ダメージ (炎上・毒)
     if ((this.dot.burnUntil > this.clock || this.dot.poisonUntil > this.clock) && this.clock >= this.dot.nextTick) {
       this.dot.nextTick = this.clock + 1;
-       const sword = applyRelicsToSword(applyCharacterToSword(run.equippedSword, run.character), run.relics ?? []);
-      let dotDmg = 0;
+       const sword = applyRelicsToSwordForContext(
+         applyCharacterToSword(run.equippedSword, run.character),
+         run.relics ?? [],
+         enemy.role === "boss"
+       );
+       let dotDmg = 0;
        if (this.dot.burnUntil > this.clock) dotDmg += dotDamagePerTick(sword, "burn");
        if (this.dot.poisonUntil > this.clock) dotDmg += dotDamagePerTick(sword, "poison");
        dotDmg = Math.round(dotDmg * relicStatusDamageMultiplier(run.relics ?? []));
+       dotDmg = Math.round(dotDmg * relicStaffStatusDamageMultiplier(run.relics ?? [], sword.type));
       if (dotDmg > 0) {
         enemy.currentHp = Math.max(0, enemy.currentHp - dotDmg);
         this.spawnFloatText(ENEMY_X + 40, ENEMY_Y - 44, `${dotDmg}`, "#f26419", 16);

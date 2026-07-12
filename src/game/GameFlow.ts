@@ -96,6 +96,9 @@ export class GameFlow {
       startedAt: Date.now(),
       bestRarityFound: null,
       relics: [],
+      bloodiedOilStacks: 0,
+      revivalUsed: false,
+      dodgeBonusFloor: 1,
       seed: newSeed(),
     };
     discoverSword(`${sword.type}:${sword.rarity}`);
@@ -108,7 +111,14 @@ export class GameFlow {
       this.ui.showTitle();
       return;
     }
-    this.run = { ...suspend.run, character: suspend.run.character ?? DEFAULT_CHARACTER };
+    this.run = {
+      ...suspend.run,
+      character: suspend.run.character ?? DEFAULT_CHARACTER,
+      relics: suspend.run.relics ?? [],
+      bloodiedOilStacks: suspend.run.bloodiedOilStacks ?? 0,
+      revivalUsed: suspend.run.revivalUsed ?? false,
+      dodgeBonusFloor: suspend.run.dodgeBonusFloor ?? 0,
+    };
     this.startFloor();
   }
 
@@ -116,7 +126,13 @@ export class GameFlow {
   startFloor(): void {
     const run = this.run;
     if (!run) return;
-    run.dodgeCharges = dodgeChargesFor(run.character.type);
+    const dodgeLimit = dodgeChargesFor(run.character.type);
+    if (run.dodgeBonusFloor !== run.floor) {
+      run.dodgeCharges = run.relics.includes("spareSheath")
+        ? Math.min(dodgeLimit, Math.max(0, run.dodgeCharges) + 1)
+        : dodgeLimit;
+      run.dodgeBonusFloor = run.floor;
+    }
     saveSuspend(run);
 
     // 乱数シード + 階層 から敵を決定論的に生成（再開時に同じ敵が出る）
@@ -172,6 +188,13 @@ export class GameFlow {
     vibrate("playerHit");
     this.ui.hudUpdate();
     if (run.playerHp <= 0) {
+      if (run.relics.includes("revivalStone") && !run.revivalUsed) {
+        run.revivalUsed = true;
+        run.playerHp = Math.max(1, Math.ceil(run.playerMaxHp * 0.2));
+        this.ui.toast("蘇生石が砕け、HP20%で復活");
+        this.ui.hudUpdate();
+        return false;
+      }
       this.endRun(false);
       return true;
     }

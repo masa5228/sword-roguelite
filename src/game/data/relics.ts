@@ -15,6 +15,14 @@ export const RELICS: Record<RelicId, Relic> = {
   luckyCoin: { id: "luckyCoin", name: "幸運のコイン", rarity: "rare", description: "会心率が5%上昇する。" },
   swiftSheath: { id: "swiftSheath", name: "疾風の鞘", rarity: "common", description: "攻撃速度が8%上昇する。" },
   bloodVial: { id: "bloodVial", name: "血瓶", rarity: "boss", description: "敵撃破時、最大HPの5%を回復する。" },
+  spareSheath: { id: "spareSheath", name: "予備の鞘", rarity: "rare", description: "各階層開始時、回避ストックを1回追加する。キャラ上限は超えない。" },
+  arcaneAmplifier: { id: "arcaneAmplifier", name: "魔導増幅核", rarity: "rare", description: "杖の燃焼・毒ダメージが25%上昇する。" },
+  chargeGlove: { id: "chargeGlove", name: "蓄力用手袋", rarity: "rare", description: "溜め時間が10%増える代わりに、最大溜め倍率が25%上昇する。" },
+  bloodiedOil: { id: "bloodiedOil", name: "血塗れの刃油", rarity: "rare", description: "非会心攻撃を当てるたび、次の通常攻撃の会心率が8%上昇。会心でリセット。" },
+  heavyCloak: { id: "heavyCloak", name: "重装外套", rarity: "common", description: "被ダメージを20%軽減する代わりに、攻撃速度が5%低下する。" },
+  comboTalisman: { id: "comboTalisman", name: "連撃の護符", rarity: "rare", description: "同じ敵への3回目の連続攻撃が35%強くなる。" },
+  revivalStone: { id: "revivalStone", name: "蘇生石", rarity: "boss", description: "1回だけ、死亡時に最大HPの20%で復活する。" },
+  bossEmblem: { id: "bossEmblem", name: "ボスの紋章", rarity: "boss", description: "ボス戦のみ、攻撃力が15%、溜め倍率が20%上昇する。" },
 };
 
 export function hasRelic(relics: RelicId[], id: RelicId): boolean {
